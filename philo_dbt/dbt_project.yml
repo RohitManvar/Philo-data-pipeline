@@ -1,0 +1,10 @@
+name: 'philo_dbt'
+version: '1.0'
+profile: 'philo_dbt'
+
+models:
+  philo_dbt:
+    staging:
+      materialized: view
+    marts:
+      materialized: table
