@@ -1,0 +1,7 @@
+requests
+beautifulsoup4
+pyspark
+dbt-postgres
+fastapi
+psycopg2-binary
+apache-airflow
