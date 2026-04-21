@@ -203,16 +203,22 @@ function buildUrl(page: number, q: string, era: string, school: string) {
   return s ? `/?${s}` : "/";
 }
 
+const EMPTY_LIST: PhilosopherList = { total: 0, page: 1, limit: 21, data: [] };
+
 export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
   const page   = Number(q.page) || 1;
   const search = (q.q as string)      || "";
   const era    = (q.era as string)    || "";
   const school = (q.school as string) || "";
-  const [result, eras, schools, allData] = await Promise.all([
-    search ? searchPhilosophers(search, page)
-           : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
-           : fetchPhilosophers(page),
-    fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
-  ]);
-  return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total } };
+  try {
+    const [result, eras, schools, allData] = await Promise.all([
+      search ? searchPhilosophers(search, page)
+             : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
+             : fetchPhilosophers(page),
+      fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
+    ]);
+    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total } };
+  } catch {
+    return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0 } };
+  }
 };
