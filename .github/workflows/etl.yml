@@ -2,7 +2,7 @@ name: ETL Pipeline
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # runs daily at 2am UTC
+    - cron: "0 2 */2 * *"  # runs every 2 days at 2am UTC
   workflow_dispatch:        # allows manual trigger from GitHub UI
 
 jobs:
