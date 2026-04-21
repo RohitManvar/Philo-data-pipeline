@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(grep -q \"localhost:3000\\\\|error\" ../frontend.log)",
+      "Read(//d/Projects/**)",
+      "Bash(node \"d:/Projects/Philo-data-pipeline-main/frontend/node_modules/next/dist/bin/next\" --version)"
+    ]
+  }
+}
