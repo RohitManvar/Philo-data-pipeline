@@ -561,3 +561,54 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .reveal, .card { opacity: 1 !important; transform: none !important; }
 }
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Nav */
+  .nav-inner { padding: 0 16px; gap: 12px; }
+  .logo-mark { font-size: 20px; }
+
+  /* Hero */
+  .hero { padding: 90px 16px 60px; }
+  .hero-orb.a { width: 180px; height: 180px; left: -60px; }
+  .hero-orb.b { width: 140px; height: 140px; right: -40px; }
+  .hero-orb.c { width: 120px; height: 120px; }
+  .hero-quote-wrap { margin-bottom: 28px; }
+  .hero-quote { font-size: 15px; min-height: 48px; }
+  .hero-search { margin-bottom: 20px; }
+  .hero-search input { height: 48px; font-size: 14px; }
+  .hero-pills { gap: 6px; }
+  .hero-pill { font-size: 11.5px; padding: 6px 11px; }
+
+  /* Layout */
+  .shell { padding: 24px 16px 60px; }
+
+  /* Sidebar hidden on mobile — user scrolls to grid directly */
+  .with-sidebar { display: block; }
+  .side-card { display: none; }
+
+  /* Cards */
+  .card-name { font-size: 19px; }
+  .card-body { padding: 14px 14px 16px; }
+
+  /* Filter banner */
+  .filter-banner { flex-wrap: wrap; gap: 8px; }
+  .filter-banner .clear { margin-left: 0; }
+
+  /* Detail hero */
+  .detail-hero-inner { padding: 40px 16px 48px; }
+  .portrait { width: 160px; height: 160px; }
+  .portrait .initials { font-size: 64px; }
+  .detail-hero h1 { font-size: clamp(28px, 8vw, 48px); }
+
+  /* Detail body */
+  .section-card { padding: 20px 16px; }
+  .influence-grid { grid-template-columns: 1fr; gap: 20px; }
+
+  /* Pagination */
+  .pager { gap: 4px; flex-wrap: wrap; }
+  .pager button { min-width: 42px; height: 42px; font-size: 13px; }
+
+  /* Footer */
+  .footer { padding: 24px 16px; }
+}
