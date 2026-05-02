@@ -33,8 +33,8 @@ export default function Navbar({ total }: { total?: number }) {
           <span>Edition · Web</span>
         </div>
         <div className="right">
-          <Link href="/archive" style={{ color: router.pathname === "/archive" ? "var(--ink)" : "inherit" }}>Archive</Link>
-          <Link href="/about" style={{ color: router.pathname === "/about" ? "var(--ink)" : "inherit" }}>About</Link>
+          <span>Archive</span>
+          <span>About</span>
         </div>
       </div>
 
@@ -53,6 +53,9 @@ export default function Navbar({ total }: { total?: number }) {
 
       <div className="np-sections">
         <Link href="/" className={"item" + (!activeEra ? " active" : "")}>All</Link>
+        <Link href="/archive" className={"item" + (router.pathname === "/archive" ? " active" : "")}>Archive</Link>
+        <Link href="/about" className={"item" + (router.pathname === "/about" ? " active" : "")}>About</Link>
+        <span className="np-sections-divider" />
         {ERAS.map((era) => (
           <Link key={era} href={`/?era=${era}`} className={"item" + (activeEra === era ? " active" : "")}>
             {era}
