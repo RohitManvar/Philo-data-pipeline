@@ -1,12 +1,14 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Navbar from "../components/Navbar";
-import { useAuth } from "../context/AuthContext";
 import { initials } from "../components/PhilosopherCard";
 
 export default function ProfilePage() {
-  const { user, loading, signout } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const loading = status === "loading";
   const router = useRouter();
 
   useEffect(() => {
@@ -15,29 +17,22 @@ export default function ProfilePage() {
 
   if (loading || !user) return null;
 
-  const joined = new Date(user.created_at).toLocaleDateString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
-  });
-
-  const handleSignOut = () => {
-    signout();
-    router.push("/");
-  };
+  const name  = user.name  || user.email || "Reader";
+  const email = user.email || "";
 
   return (
     <>
       <Head>
-        <title>{user.username} &mdash; Enlyghten</title>
+        <title>{name} &mdash; Enlyghten</title>
       </Head>
       <div className="np-shell">
         <Navbar />
 
         <div className="np-headline-block" style={{ marginTop: 24 }}>
           <div className="kicker">Reader Profile</div>
-          <h1>{user.username}</h1>
+          <h1>{name}</h1>
           <div className="deck">Member of the Enlyghten Readership</div>
           <div className="meta">
-            <span>Joined <b>{joined}</b></span>
             <span>Edition <b>Web</b></span>
           </div>
         </div>
@@ -45,22 +40,26 @@ export default function ProfilePage() {
         <div className="profile-body">
           <div className="profile-main">
             <div className="profile-avatar">
-              <div className="profile-initials">{initials(user.username)}</div>
+              {user.image ? (
+                <img src={user.image} alt={name} style={{ width: 120, height: 120, borderRadius: "50%", objectFit: "cover" }} />
+              ) : (
+                <div className="profile-initials">{initials(name)}</div>
+              )}
             </div>
 
             <div className="np-sidecard" style={{ marginTop: 28 }}>
               <div className="h">Account Details</div>
               <dl>
-                <dt>Username</dt>
-                <dd>{user.username}</dd>
+                <dt>Name</dt>
+                <dd>{name}</dd>
                 <dt>Email</dt>
-                <dd>{user.email}</dd>
-                <dt>Member since</dt>
-                <dd>{joined}</dd>
+                <dd>{email}</dd>
+                <dt>Provider</dt>
+                <dd>Google</dd>
               </dl>
             </div>
 
-            <button className="profile-signout" onClick={handleSignOut}>
+            <button className="profile-signout" onClick={() => signOut({ callbackUrl: "/" })}>
               Sign Out
             </button>
           </div>
