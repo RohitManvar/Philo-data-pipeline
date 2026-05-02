@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { initials } from "./PhilosopherCard";
 
 const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
 export default function Navbar({ total }: { total?: number }) {
   const router    = useRouter();
-  const { user }  = useAuth();
   const activeEra = (router.query.era as string) || "";
   const currentQ  = (router.query.q  as string) || "";
 
@@ -38,13 +35,6 @@ export default function Navbar({ total }: { total?: number }) {
         <div className="right">
           <Link href="/archive" style={{ color: router.pathname === "/archive" ? "var(--ink)" : "inherit" }}>Archive</Link>
           <Link href="/about" style={{ color: router.pathname === "/about" ? "var(--ink)" : "inherit" }}>About</Link>
-          {user ? (
-            <Link href="/profile" className="nav-avatar" title={user.username}>
-              {initials(user.username)}
-            </Link>
-          ) : (
-            <Link href="/signin" style={{ color: router.pathname === "/signin" ? "var(--ink)" : "inherit" }}>Sign In</Link>
-          )}
         </div>
       </div>
 
