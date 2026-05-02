@@ -29,10 +29,6 @@ export default function TermsPage() {
               <h3 className="np-section-h">User Accounts</h3>
               <p>Accounts are created via Google OAuth. You are responsible for maintaining the security of your Google account. We are not liable for any loss resulting from unauthorised access to your account.</p>
 
-              <h3 className="np-section-h">Content</h3>
-              <p>Philosopher biographies and data are compiled from public domain sources and open encyclopedias. We make no warranty as to the accuracy or completeness of the information provided.</p>
-              <p>Wikipedia links are provided for further reading. We are not responsible for third-party content.</p>
-
               <h3 className="np-section-h">Availability</h3>
               <p>Enlyghten is provided &ldquo;as is&rdquo; without any guarantees of uptime or availability. We reserve the right to modify or discontinue the service at any time.</p>
 
@@ -40,7 +36,7 @@ export default function TermsPage() {
               <p>We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the new terms.</p>
 
               <h3 className="np-section-h">Contact</h3>
-              <p>Questions? Email <a href="mailto:rohitmanvar123@gmail.com" style={{ color: "var(--accent)" }}>rohitmanvar123@gmail.com</a></p>
+              <p>Questions? Email <a href="mailto:rohitmanvar.dev@gmail.com" style={{ color: "var(--accent)" }}>rohitmanvar.dev@gmail.com</a></p>
             </div>
           </article>
         </div>

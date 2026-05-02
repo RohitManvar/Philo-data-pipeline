@@ -36,10 +36,10 @@ export default function PrivacyPage() {
               <p><b>Render:</b> The API and database are hosted on Render.</p>
 
               <h3 className="np-section-h">Data Deletion</h3>
-              <p>You can sign out at any time. To delete your account and all saved data, contact us at rohitmanvar123@gmail.com and we will remove your data within 7 days.</p>
+              <p>You can sign out at any time. To delete your account and all saved data, contact us at rohitmanvar.dev@gmail.com and we will remove your data within 7 days.</p>
 
               <h3 className="np-section-h">Contact</h3>
-              <p>Questions? Email <a href="mailto:rohitmanvar123@gmail.com" style={{ color: "var(--accent)" }}>rohitmanvar123@gmail.com</a></p>
+              <p>Questions? Email <a href="mailto:rohitmanvar.dev@gmail.com" style={{ color: "var(--accent)" }}>rohitmanvar.dev@gmail.com</a></p>
             </div>
           </article>
         </div>

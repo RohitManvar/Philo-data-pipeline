@@ -6,6 +6,22 @@ import { initials } from "./PhilosopherCard";
 
 const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
+function MastheadQuote() {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div className={"np-masthead-quote" + (visible ? "" : " np-masthead-quote-hide")}>
+      &ldquo;I&rsquo;m exerting myself to escape the same mind that traps me.&rdquo;
+      <span className="np-masthead-quote-attr"> &mdash; rohyt</span>
+    </div>
+  );
+}
+
 export default function Navbar({ total }: { total?: number }) {
   const router    = useRouter();
   const activeEra = (router.query.era as string) || "";
@@ -98,6 +114,7 @@ export default function Navbar({ total }: { total?: number }) {
         <div className="established">Established MMXXIV · A Daily Encyclopedia of Thought</div>
         <h1>Enl<span className="y">y</span>ghten</h1>
         <div className="tagline">&ldquo;All the philosophy that&rsquo;s fit to read&rdquo;</div>
+        <MastheadQuote />
       </div>
 
       <div className="np-masthead-meta">

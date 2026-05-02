@@ -139,6 +139,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   font-family: var(--display); font-style: italic;
   font-size: 17px; color: var(--ink-2); margin-top: 8px; letter-spacing: 0.02em;
 }
+.np-masthead-quote {
+  font-family: var(--display); font-style: italic;
+  font-size: 13px; color: var(--accent); margin-top: 10px; letter-spacing: 0.02em;
+  opacity: 1; transition: opacity 1.4s ease;
+}
+.np-masthead-quote-hide { opacity: 0; }
+.np-masthead-quote-attr {
+  font-family: var(--sans); font-style: normal;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft);
+}
 .np-byline {
   font-family: var(--display); font-style: italic;
   font-size: 14px; color: var(--accent);
