@@ -1,9 +1,11 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { cleanDate } from "../lib/clean";
+import { getSaved, toggleSave, SavedPhilosopher } from "../lib/readingList";
 
 interface Props {
   byEra: Record<string, Philosopher[]>;
@@ -16,6 +18,14 @@ export default function ArchivePage({ byEra, total }: Props) {
   const eras = ERA_ORDER.filter((e) => byEra[e]?.length).concat(
     Object.keys(byEra).filter((e) => !ERA_ORDER.includes(e) && byEra[e]?.length)
   );
+
+  const [readingList, setReadingList] = useState<SavedPhilosopher[]>([]);
+  useEffect(() => { setReadingList(getSaved()); }, []);
+
+  const handleRemove = (slug: string) => {
+    toggleSave({ slug, name: "", era: null, school: null, savedAt: "" });
+    setReadingList(getSaved());
+  };
 
   return (
     <>
@@ -36,6 +46,30 @@ export default function ArchivePage({ byEra, total }: Props) {
             <span><b>{eras.length}</b> Eras</span>
           </div>
         </div>
+
+        {readingList.length > 0 && (
+          <div className="arc-reading-list">
+            <div className="arc-era-head">
+              <h2>★ Your Reading List</h2>
+              <span className="arc-count">{readingList.length} saved</span>
+            </div>
+            <ol className="arc-list">
+              {readingList.map((p) => (
+                <li key={p.slug} className="arc-item">
+                  <Link href={`/${p.slug}`} className="arc-link">
+                    <span className="arc-name">{p.name}</span>
+                    <span className="arc-rule" />
+                    <span className="arc-meta">
+                      {p.era || ""}
+                      {p.school ? ` · ${p.school}` : ""}
+                    </span>
+                  </Link>
+                  <button className="arc-remove" onClick={() => handleRemove(p.slug)} title="Remove">✕</button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
 
         <div className="arc-body">
           {eras.map((era) => {

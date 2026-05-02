@@ -2,11 +2,12 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { eraGradient, initials } from "../components/PhilosopherCard";
 import { cleanText, cleanDate } from "../lib/clean";
+import { isSaved, toggleSave } from "../lib/readingList";
 
 export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,7 +28,15 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
     return () => io.disconnect();
   }, [p.id]);
 
-  const inits       = initials(p.philosopher_name);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { setSaved(isSaved(p.slug)); }, [p.slug]);
+
+  const handleSave = () => {
+    const next = toggleSave({ slug: p.slug, name: p.philosopher_name, era: p.era, school: p.school, savedAt: "" });
+    setSaved(next);
+  };
+
+  const inits = initials(p.philosopher_name);
   const firstName   = p.philosopher_name.split(" ")[0];
   const ideas       = p.main_ideas    ? p.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean).slice(0, 6) : [];
   const influencedBy = p.influenced_by ? p.influenced_by.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [];
@@ -44,7 +53,12 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
         <Navbar />
 
         <div ref={ref}>
-          <Link href="/" className="np-back">&larr; Return to Front Page</Link>
+          <div className="slug-topbar">
+            <Link href="/" className="np-back">&larr; Return to Front Page</Link>
+            <button className={"save-btn" + (saved ? " saved" : "")} onClick={handleSave}>
+              {saved ? "★ Saved to Archive" : "☆ Save to Archive"}
+            </button>
+          </div>
 
           <div className="np-headline-block np-reveal">
             <div className="kicker">{[p.era, p.school].filter(Boolean).join(" · ")}</div>
