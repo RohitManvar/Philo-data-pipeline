@@ -2,6 +2,16 @@ from sqlalchemy import Column, Integer, Text, TIMESTAMP, func
 from database import Base
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id            = Column(Integer, primary_key=True, index=True)
+    email         = Column(Text, unique=True, nullable=False, index=True)
+    username      = Column(Text, unique=True, nullable=False)
+    password_hash = Column(Text, nullable=False)
+    created_at    = Column(TIMESTAMP, server_default=func.now())
+
+
 class Philosopher(Base):
     __tablename__ = "philosophers"
 

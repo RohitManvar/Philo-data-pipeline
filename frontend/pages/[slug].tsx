@@ -167,7 +167,7 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
 
         <footer className="footer">
           <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read &middot; Data sourced from Wikipedia &middot; Built with Next.js + FastAPI</div>
+          <div>All the philosophy that&rsquo;s fit to read</div>
         </footer>
       </div>
     </>
