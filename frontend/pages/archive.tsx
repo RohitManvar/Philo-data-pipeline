@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { cleanDate } from "../lib/clean";
-import { getSaved, toggleSave, SavedPhilosopher } from "../lib/readingList";
+import { SavedPhilosopher } from "../lib/readingList";
 import { useSession } from "next-auth/react";
 
 interface Props {
@@ -31,11 +31,23 @@ export default function ArchivePage({ byEra, total }: Props) {
   );
 
   const [readingList, setReadingList] = useState<SavedPhilosopher[]>([]);
-  useEffect(() => { setReadingList(getSaved()); }, []);
 
-  const handleRemove = (slug: string) => {
-    toggleSave({ slug, name: "", era: null, school: null, savedAt: "" });
-    setReadingList(getSaved());
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    fetch(`/api/saved/${encodeURIComponent(session.user.email)}`)
+      .then(r => r.json())
+      .then(setReadingList)
+      .catch(() => {});
+  }, [session]);
+
+  const handleRemove = async (slug: string) => {
+    if (!session?.user?.email) return;
+    await fetch(`/api/saved/${encodeURIComponent(slug)}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: session.user.email }),
+    });
+    setReadingList(prev => prev.filter(p => p.slug !== slug));
   };
 
   if (loading || !user) return null;

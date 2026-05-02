@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from database import engine
 from models import Base
 from routers import philosophers, categories
-from routers import auth
+from routers import auth, saved
 
 
 @asynccontextmanager
@@ -28,6 +28,7 @@ app.add_middleware(
 app.include_router(philosophers.router)
 app.include_router(categories.router)
 app.include_router(auth.router)
+app.include_router(saved.router)
 
 
 @app.get("/")

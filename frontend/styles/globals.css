@@ -743,6 +743,29 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   transition: border-color .15s, color .15s;
 }
 .profile-signout:hover { border-color: var(--accent); color: var(--accent); }
+.profile-action-btn {
+  display: block; width: 100%; padding: 11px; text-align: center;
+  border: 1px solid var(--rule); background: var(--ink); color: var(--paper);
+  font-family: var(--sans); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  transition: background .15s;
+}
+.profile-action-btn:hover { background: var(--accent); }
+.profile-era-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.profile-era-row { display: flex; align-items: center; gap: 10px; }
+.profile-era-label { font-family: var(--sans); font-size: 11px; letter-spacing: 0.08em; width: 100px; flex-shrink: 0; color: var(--ink-2); }
+.profile-era-track { flex: 1; height: 6px; background: var(--paper-2); border: 1px solid var(--rule-soft); }
+.profile-era-fill { height: 100%; background: var(--ink); transition: width .4s ease; }
+.profile-era-count { font-family: var(--sans); font-size: 11px; color: var(--ink-soft); width: 20px; text-align: right; }
+.profile-saved-list { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; }
+.profile-saved-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 9px 0; border-bottom: 1px solid var(--rule-soft);
+  transition: color .15s;
+}
+.profile-saved-item:hover { color: var(--accent); }
+.profile-saved-name { font-family: var(--serif); font-size: 15px; }
+.profile-saved-era { font-family: var(--sans); font-size: 11px; letter-spacing: 0.08em; color: var(--ink-soft); text-transform: uppercase; }
+.profile-see-more { display: block; margin-top: 12px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
 
 /* ── Reveal animation ───────────────────────────────────── */
 .np-reveal {

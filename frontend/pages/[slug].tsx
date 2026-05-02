@@ -2,11 +2,12 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { eraGradient, initials } from "../components/PhilosopherCard";
 import { cleanText, cleanDate, secureUrl } from "../lib/clean";
-import { isSaved, toggleSave } from "../lib/readingList";
+import { isSaved } from "../lib/readingList";
 
 export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,12 +28,46 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
     return () => io.disconnect();
   }, [p.id]);
 
+  const { data: session } = useSession();
   const [saved, setSaved] = useState(false);
-  useEffect(() => { setSaved(isSaved(p.slug)); }, [p.slug]);
+  const [saveLoading, setSaveLoading] = useState(false);
 
-  const handleSave = () => {
-    const next = toggleSave({ slug: p.slug, name: p.philosopher_name, era: p.era, school: p.school, savedAt: "" });
-    setSaved(next);
+  useEffect(() => {
+    if (!session?.user?.email) { setSaved(isSaved(p.slug)); return; }
+    fetch(`/api/saved/${encodeURIComponent(session.user.email)}`)
+      .then(r => r.json())
+      .then((list: { slug: string }[]) => setSaved(list.some(x => x.slug === p.slug)))
+      .catch(() => setSaved(isSaved(p.slug)));
+  }, [p.slug, session]);
+
+  const handleSave = async () => {
+    if (!session?.user?.email) { signIn(); return; }
+    setSaveLoading(true);
+    try {
+      if (saved) {
+        await fetch(`/api/saved/${encodeURIComponent(p.slug)}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: session.user.email }),
+        });
+        setSaved(false);
+      } else {
+        await fetch("/api/saved", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_email: session.user.email,
+            slug: p.slug,
+            philosopher_name: p.philosopher_name,
+            era: p.era,
+            school: p.school,
+          }),
+        });
+        setSaved(true);
+      }
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const inits = initials(p.philosopher_name);
@@ -54,8 +89,8 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
         <div ref={ref}>
           <div className="slug-topbar">
             <Link href="/" className="np-back">&larr; Return to Front Page</Link>
-            <button className={"save-btn" + (saved ? " saved" : "")} onClick={handleSave}>
-              {saved ? "★ Saved to Archive" : "☆ Save to Archive"}
+            <button className={"save-btn" + (saved ? " saved" : "")} onClick={handleSave} disabled={saveLoading}>
+              {saveLoading ? "…" : saved ? "★ Saved to Archive" : "☆ Save to Archive"}
             </button>
           </div>
 

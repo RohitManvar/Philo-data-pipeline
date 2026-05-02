@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, TIMESTAMP, func
+from sqlalchemy import Column, Integer, Text, TIMESTAMP, UniqueConstraint, func
 from database import Base
 
 
@@ -10,6 +10,19 @@ class User(Base):
     username      = Column(Text, unique=True, nullable=False)
     password_hash = Column(Text, nullable=False)
     created_at    = Column(TIMESTAMP, server_default=func.now())
+
+
+class SavedPhilosopher(Base):
+    __tablename__ = "saved_philosophers"
+    __table_args__ = (UniqueConstraint("user_email", "slug"),)
+
+    id              = Column(Integer, primary_key=True, index=True)
+    user_email      = Column(Text, nullable=False, index=True)
+    slug            = Column(Text, nullable=False)
+    philosopher_name = Column(Text, nullable=False)
+    era             = Column(Text)
+    school          = Column(Text)
+    saved_at        = Column(TIMESTAMP, server_default=func.now())
 
 
 class Philosopher(Base):
