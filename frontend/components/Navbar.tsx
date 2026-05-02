@@ -47,7 +47,7 @@ export default function Navbar({ total }: { total?: number }) {
           <span>Edition · Web</span>
         </div>
         <div className="right">
-          <Link href="/about" className="np-signin-link">About</Link>
+          {!user && <Link href="/about" className="np-signin-link">About</Link>}
           {user ? (
             <div className="np-user-chip" ref={dropRef} onClick={() => setDropOpen((v) => !v)}>
               <span className="np-user-avatar">{initials(user.name || user.email || "U")}</span>
