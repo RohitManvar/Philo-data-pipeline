@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { initials } from "./PhilosopherCard";
 
 const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
@@ -8,6 +10,7 @@ export default function Navbar({ total }: { total?: number }) {
   const router    = useRouter();
   const activeEra = (router.query.era as string) || "";
   const currentQ  = (router.query.q  as string) || "";
+  const { user }  = useAuth();
 
   const [q, setQ]         = useState(currentQ);
   const [dateStr, setDateStr] = useState("");
@@ -33,8 +36,14 @@ export default function Navbar({ total }: { total?: number }) {
           <span>Edition · Web</span>
         </div>
         <div className="right">
-          <span>Archive</span>
-          <span>About</span>
+          {user ? (
+            <Link href="/profile" className="np-user-chip">
+              <span className="np-user-avatar">{initials(user.username)}</span>
+              <span>{user.username}</span>
+            </Link>
+          ) : (
+            <Link href="/signin" className="np-signin-link">Sign In</Link>
+          )}
         </div>
       </div>
 

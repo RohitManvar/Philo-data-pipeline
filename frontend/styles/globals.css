@@ -65,8 +65,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   border-bottom: 1px solid var(--rule);
   padding-bottom: 8px;
 }
-.np-topbar .left, .np-topbar .right { display: flex; gap: 18px; }
+.np-topbar .left, .np-topbar .right { display: flex; gap: 18px; align-items: center; }
 @media (max-width: 640px) { .np-topbar .right { display: none; } }
+.np-signin-link { color: var(--ink-soft); letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; transition: color .15s; }
+.np-signin-link:hover { color: var(--accent); }
+.np-user-chip { display: flex; align-items: center; gap: 7px; color: var(--ink-soft); transition: color .15s; }
+.np-user-chip:hover { color: var(--ink); }
+.np-user-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--sans); font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+  display: flex; align-items: center; justify-content: center;
+}
 
 .np-masthead {
   text-align: center; padding: 22px 0 14px;
