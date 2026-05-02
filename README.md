@@ -23,14 +23,14 @@ raw_data/  →  etl/  →  PostgreSQL  →  FastAPI (Render)  →  Next.js (Verc
 ```
 philo-data-pipeline/
 ├── api/                        # FastAPI backend
-│   ├── main.py                 # App entry point + CORS config
+│   ├── main.py                 # App entry point, CORS config, startup migration
 │   ├── models.py               # SQLAlchemy models (Philosopher, SavedPhilosopher)
 │   ├── schemas.py              # Pydantic schemas
 │   ├── database.py             # DB session setup
 │   ├── routers/
 │   │   ├── philosophers.py     # List, search, filter, random, daily endpoints
-│   │   ├── saved.py            # Reading list (GET / POST / DELETE per user)
-│   │   └── categories.py
+│   │   ├── saved.py            # Reading list (GET / POST / PATCH / DELETE)
+│   │   └── categories.py      # Eras and schools
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── etl/                        # ETL pipeline
@@ -40,27 +40,32 @@ philo-data-pipeline/
 │   └── pipeline.py
 ├── frontend/                   # Next.js app
 │   ├── pages/
-│   │   ├── index.tsx           # Home: philosopher grid, Philosopher of the Day, Surprise Me
-│   │   ├── [slug].tsx          # Philosopher detail page
-│   │   ├── archive.tsx         # Saved reading list (auth-protected)
-│   │   ├── profile.tsx         # User profile + reading stats + Discover Next
-│   │   ├── signin.tsx          # Google sign-in page
+│   │   ├── index.tsx           # Home: grid, Philosopher of the Day, Surprise Me, epigraph
+│   │   ├── [slug].tsx          # Philosopher detail: progress bar, share, quote card, notes
+│   │   ├── archive.tsx         # Reading list (auth-protected), skeleton loader, empty state
+│   │   ├── profile.tsx         # User profile, reading stats, streak, Discover Next
+│   │   ├── signin.tsx          # Google sign-in
 │   │   ├── about.tsx           # About page
+│   │   ├── privacy.tsx         # Privacy policy
+│   │   ├── terms.tsx           # Terms of use
+│   │   ├── 404.tsx             # Custom not-found page
 │   │   └── api/                # Next.js API routes (CORS proxy to Render)
 │   │       ├── auth/[...nextauth].ts
 │   │       ├── suggest.ts      # Search autocomplete proxy
-│   │       └── saved/          # Reading list proxy routes
+│   │       └── saved/          # Reading list proxy (GET / POST / PATCH / DELETE)
 │   ├── components/
-│   │   ├── Navbar.tsx          # Masthead, era filters, search, user dropdown
+│   │   ├── Navbar.tsx          # Masthead, era filters, search, user dropdown, quote intro
+│   │   ├── Footer.tsx          # Links, back-to-top, last updated
 │   │   ├── PhilosopherCard.tsx
-│   │   └── FilterSidebar.tsx
+│   │   └── FilterSidebar.tsx   # Stats (clickable: thinkers / eras / schools), era & school filters
 │   ├── lib/
 │   │   ├── api.ts              # Fetch helpers for Render API
 │   │   ├── theme.ts            # Dark / light mode (localStorage)
 │   │   ├── clean.ts            # Text sanitisation helpers
-│   │   └── readingList.ts      # localStorage reading list helpers
-│   └── styles/
-│       └── globals.css
+│   │   └── readingList.ts      # Reading list type definitions
+│   ├── styles/
+│   │   └── globals.css
+│   └── next.config.js          # Image domains, WebP, compression
 ├── .github/workflows/          # GitHub Actions — ETL runs every 2 days
 ├── raw_data/                   # Source JSON data
 └── docker-compose.yml          # Local dev: PostgreSQL + FastAPI
@@ -68,32 +73,55 @@ philo-data-pipeline/
 
 ## Features
 
+**Reading**
 - **Newspaper design** — masthead, era section tabs, broadsheet grid layout
-- **Google OAuth** — sign in with Google, sessions via NextAuth.js
-- **Reading list** — save philosophers to your personal archive (stored in DB per user)
-- **Profile page** — reading stats, top era, reading streak, Discover Next recommendation
-- **Search with autocomplete** — debounced suggestions as you type
 - **Philosopher of the Day** — deterministic daily pick based on date
+- **Daily epigraph** — quote from today's philosopher shown on home page
 - **Surprise Me** — random philosopher button
-- **Dark mode** — persisted via localStorage
-- **Reading progress bar** — scroll percentage indicator on detail pages
+- **Reading progress bar** — scroll percentage on detail pages
+- **Custom 404** — "Lost in Thought" not-found page
+
+**Discovery**
+- **Search with autocomplete** — debounced suggestions, AbortController for stale requests
+- **Clickable stats sidebar** — click Thinkers / Eras / Schools to expand full lists
+- **Filter by era and school** — via sidebar or section tabs
+
+**User**
+- **Google OAuth** — sign in with Google via NextAuth.js
+- **Reading list** — save philosophers, stored in DB per user
+- **Personal notes** — add a one-line note to any saved philosopher
+- **Profile page** — reading stats, top era, reading streak, Discover Next recommendation
+- **Archive page** — full reading list with skeleton loader and empty state
+
+**UI**
+- **Dark mode** — toggled from profile, persisted via localStorage
+- **Quote intro** — rohyt's quote fades in on first visit (sessionStorage guard)
 - **Share button** — Web Share API with clipboard fallback
-- **Quote card** — shareable quote modal with copy + Twitter/X share
+- **Quote card** — shareable modal with copy + Twitter/X share
+- **Footer** — About, Privacy Policy, Terms of Use, Last Updated, Back to Top
 - **Responsive** — mobile-friendly layout
+
+**Performance**
+- `useMemo` for string parsing on detail pages
+- Server-side sort in `getServerSideProps` (archive)
+- AbortController cancels stale search requests
+- WebP image format via `next.config.js`
+- Gzip/Brotli compression enabled
 
 ## API Endpoints
 
-| Method | Endpoint                          | Description                        |
-|--------|-----------------------------------|------------------------------------|
-| GET    | `/philosophers`                   | List all philosophers (paginated)  |
-| GET    | `/philosophers/{slug}`            | Get philosopher by slug            |
-| GET    | `/philosophers/search?q=`         | Full-text search                   |
-| GET    | `/philosophers/filter?era=`       | Filter by era                      |
-| GET    | `/philosophers/random`            | Random philosopher                 |
-| GET    | `/philosophers/daily`             | Philosopher of the Day             |
-| GET    | `/saved/{email}`                  | Get user's saved list              |
-| POST   | `/saved`                          | Save a philosopher                 |
-| DELETE | `/saved/{slug}`                   | Remove from saved list             |
+| Method | Endpoint                              | Description                        |
+|--------|---------------------------------------|------------------------------------|
+| GET    | `/philosophers`                       | List all philosophers (paginated)  |
+| GET    | `/philosophers/{slug}`                | Get philosopher by slug            |
+| GET    | `/philosophers/search?q=`             | Full-text search                   |
+| GET    | `/philosophers/filter?era=`           | Filter by era / school             |
+| GET    | `/philosophers/random`                | Random philosopher                 |
+| GET    | `/philosophers/daily`                 | Philosopher of the Day             |
+| GET    | `/saved/{email}`                      | Get user's saved list (with notes) |
+| POST   | `/saved`                              | Save a philosopher                 |
+| PATCH  | `/saved/{email}/{slug}/note`          | Update personal note               |
+| DELETE | `/saved/{email}/{slug}`               | Remove from saved list             |
 
 ## Getting Started (Local)
 
@@ -150,7 +178,11 @@ DATABASE_URL=postgresql://user:pass@host/dbname
 
 ## ETL Schedule
 
-The ETL pipeline runs automatically every 2 days via GitHub Actions (`.github/workflows/`), fetching fresh philosopher data and loading it into the production database on Render.
+The ETL pipeline runs automatically every 2 days via GitHub Actions, fetching fresh philosopher data and loading it into the production database on Render.
+
+## DB Migrations
+
+Column additions run automatically on API startup via the lifespan handler in `main.py`. No manual migration step needed on deploy.
 
 ## License
 
