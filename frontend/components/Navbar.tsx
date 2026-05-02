@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useSession, signOut } from "next-auth/react";
 import { initials } from "./PhilosopherCard";
 
 const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
@@ -10,7 +10,8 @@ export default function Navbar({ total }: { total?: number }) {
   const router    = useRouter();
   const activeEra = (router.query.era as string) || "";
   const currentQ  = (router.query.q  as string) || "";
-  const { user, signout } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
   const [dropOpen, setDropOpen] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
 
@@ -49,15 +50,15 @@ export default function Navbar({ total }: { total?: number }) {
           <Link href="/about" className="np-signin-link">About</Link>
           {user ? (
             <div className="np-user-chip" ref={dropRef} onClick={() => setDropOpen((v) => !v)}>
-              <span className="np-user-avatar">{initials(user.username)}</span>
-              <span>{user.username}</span>
+              <span className="np-user-avatar">{initials(user.name || user.email || "U")}</span>
+              <span>{user.name?.split(" ")[0] || user.email}</span>
               <span className="np-user-caret">▾</span>
               {dropOpen && (
                 <div className="np-user-dropdown">
                   <Link href="/profile" className="np-dd-item" onClick={() => setDropOpen(false)}>Profile</Link>
                   <Link href="/archive" className="np-dd-item" onClick={() => setDropOpen(false)}>Archive</Link>
                   <Link href="/about" className="np-dd-item" onClick={() => setDropOpen(false)}>About</Link>
-                  <button className="np-dd-item np-dd-signout" onClick={() => { signout(); setDropOpen(false); router.push("/"); }}>Sign Out</button>
+                  <button className="np-dd-item np-dd-signout" onClick={() => { signOut({ callbackUrl: "/" }); setDropOpen(false); }}>Sign Out</button>
                 </div>
               )}
             </div>

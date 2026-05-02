@@ -7,7 +7,7 @@ import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { cleanDate } from "../lib/clean";
 import { getSaved, toggleSave, SavedPhilosopher } from "../lib/readingList";
-import { useAuth } from "../context/AuthContext";
+import { useSession } from "next-auth/react";
 
 interface Props {
   byEra: Record<string, Philosopher[]>;
@@ -17,7 +17,9 @@ interface Props {
 const ERA_ORDER = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
 export default function ArchivePage({ byEra, total }: Props) {
-  const { user, loading } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const loading = status === "loading";
   const router = useRouter();
 
   useEffect(() => {
