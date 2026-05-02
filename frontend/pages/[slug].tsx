@@ -1,12 +1,11 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { eraGradient, initials } from "../components/PhilosopherCard";
-import { cleanText, cleanDate } from "../lib/clean";
+import { cleanText, cleanDate, secureUrl } from "../lib/clean";
 import { isSaved, toggleSave } from "../lib/readingList";
 
 export default function PhilosopherPage({ p }: { p: Philosopher }) {
@@ -75,8 +74,8 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
           <div className="np-article-grid">
             <article className="np-article-body">
               <div className="lead-img" style={{ background: eraGradient(p.era) }}>
-                {p.image_url ? (
-                  <Image src={p.image_url} alt={p.philosopher_name} fill unoptimized />
+                {secureUrl(p.image_url) ? (
+                  <img src={secureUrl(p.image_url)!} alt={p.philosopher_name} />
                 ) : (
                   <div className="initials">{inits}</div>
                 )}

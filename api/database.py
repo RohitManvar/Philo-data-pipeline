@@ -2,7 +2,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-DB_URL = (
+DB_URL = os.getenv("DATABASE_URL") or (
     f"postgresql://{os.getenv('DB_USER', 'postgres')}:"
     f"{os.getenv('DB_PASSWORD', 'password')}@"
     f"{os.getenv('DB_HOST', 'localhost')}:"

@@ -1,8 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Philosopher } from "../lib/api";
-import { cleanText, cleanDate } from "../lib/clean";
+import { cleanText, cleanDate, secureUrl } from "../lib/clean";
 
 const ERA_GRADIENTS: Record<string, string> = {
   ancient:       "linear-gradient(135deg, #8b6f3f, #c9a878)",
@@ -53,8 +52,8 @@ export default function PhilosopherCard({ p, index = 0 }: { p: Philosopher; inde
     <Link href={`/${p.slug}`} className="np-article" ref={ref}>
       <div className="kicker">{[p.era, p.school].filter(Boolean).join(" · ")}</div>
       <div className="np-portrait" style={{ background: eraGradient(p.era) }}>
-        {p.image_url ? (
-          <Image src={p.image_url} alt={p.philosopher_name} fill unoptimized />
+        {secureUrl(p.image_url) ? (
+          <img src={secureUrl(p.image_url)!} alt={p.philosopher_name} />
         ) : (
           <div className="initials">{initials(p.philosopher_name)}</div>
         )}

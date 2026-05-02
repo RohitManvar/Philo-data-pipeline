@@ -31,6 +31,12 @@ export function cleanDate(raw: string | null | undefined): string {
   return s.slice(0, 30);
 }
 
+/** Force image URL to HTTPS to avoid mixed-content blocks on Vercel. */
+export function secureUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.replace(/^http:\/\//i, "https://");
+}
+
 /** Return true if a school name is suitable to display as a filter option. */
 export function isCleanSchool(school: string): boolean {
   if (!school) return false;

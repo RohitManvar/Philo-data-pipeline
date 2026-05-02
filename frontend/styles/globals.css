@@ -45,10 +45,13 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: transparent; }
 
-/* Image fit helpers (replaces Tailwind object-cover) */
+/* Image fit helpers */
 .np-portrait img,
-.lead-img img,
-.np-article-body .lead-img img { object-fit: cover; object-position: top; width: 100%; height: 100%; }
+.lead-img img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top center;
+}
 
 /* ── Shell ──────────────────────────────────────────────── */
 .np-shell { max-width: 1200px; width: 100%; margin: 0 auto; padding: 18px 28px 60px; overflow-x: hidden; }
@@ -113,6 +116,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   transition: background .15s, color .15s; cursor: pointer; display: block;
 }
 .np-sections .item:first-child { border-left: 1px solid var(--rule-soft); }
+.np-sections-divider {
+  width: 1px; background: var(--rule); margin: 8px 0; flex-shrink: 0;
+}
 .np-sections .item:hover { background: var(--paper-2); color: var(--ink); }
 .np-sections .item.active { background: var(--ink); color: var(--paper); }
 

@@ -8,7 +8,7 @@ import {
 import PhilosopherCard, { eraGradient, initials } from "../components/PhilosopherCard";
 import FilterSidebar from "../components/FilterSidebar";
 import Navbar from "../components/Navbar";
-import { cleanText, cleanDate } from "../lib/clean";
+import { cleanText, cleanDate, secureUrl } from "../lib/clean";
 
 interface Props {
   result: PhilosopherList;
@@ -32,7 +32,11 @@ function LeadStory({ p }: { p: Philosopher }) {
       </div>
       <div className="np-lead-portrait">
         <div className="img" style={{ background: eraGradient(p.era) }}>
-          <div className="initials">{inits}</div>
+          {secureUrl(p.image_url) ? (
+            <img src={secureUrl(p.image_url)!} alt={p.philosopher_name} />
+          ) : (
+            <div className="initials">{inits}</div>
+          )}
         </div>
         <div className="caption">
           {p.philosopher_name} &middot; {p.era || "Philosopher"} &middot; From the Enlyghten archive.
