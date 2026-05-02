@@ -22,6 +22,7 @@ interface Props {
   school: string;
   allTotal: number;
   daily: Philosopher | null;
+  allPhilosophers: Philosopher[];
 }
 
 function LeadStory({ p }: { p: Philosopher }) {
@@ -50,7 +51,7 @@ function LeadStory({ p }: { p: Philosopher }) {
   );
 }
 
-export default function Home({ result, eras, schools, query, era, school, allTotal, daily }: Props) {
+export default function Home({ result, eras, schools, query, era, school, allTotal, daily, allPhilosophers }: Props) {
   const router     = useRouter();
   const totalPages = Math.ceil(result.total / result.limit);
   const isFiltered = !!(query || era || school);
@@ -166,7 +167,7 @@ export default function Home({ result, eras, schools, query, era, school, allTot
             )}
           </main>
 
-          <FilterSidebar eras={eras} schools={schools} activeEra={era} activeSchool={school} total={allTotal} />
+          <FilterSidebar eras={eras} schools={schools} activeEra={era} activeSchool={school} total={allTotal} allPhilosophers={allPhilosophers} />
         </div>
 
         <Footer />
@@ -193,15 +194,17 @@ export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
   const era    = (q.era    as string) || "";
   const school = (q.school as string) || "";
   try {
-    const [result, eras, schools, allData, daily] = await Promise.all([
+    const [result, eras, schools, allData, daily, allList] = await Promise.all([
       search ? searchPhilosophers(search, page)
              : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
              : fetchPhilosophers(page),
       fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
       fetchDailyPhilosopher().catch(() => null),
+      fetchPhilosophers(1, 500),
     ]);
-    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total, daily: daily ?? null } };
+    const allPhilosophers = allList.data.slice().sort((a, b) => a.philosopher_name.localeCompare(b.philosopher_name));
+    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total, daily: daily ?? null, allPhilosophers } };
   } catch {
-    return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0, daily: null } };
+    return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0, daily: null, allPhilosophers: [] } };
   }
 };

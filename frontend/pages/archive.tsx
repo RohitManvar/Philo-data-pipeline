@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
@@ -27,9 +27,10 @@ export default function ArchivePage({ byEra, total }: Props) {
     if (!loading && !user) router.replace("/signin?next=/archive");
   }, [user, loading, router]);
 
-  const eras = ERA_ORDER.filter((e) => byEra[e]?.length).concat(
-    Object.keys(byEra).filter((e) => !ERA_ORDER.includes(e) && byEra[e]?.length)
-  );
+  const eras = useMemo(() =>
+    ERA_ORDER.filter((e) => byEra[e]?.length).concat(
+      Object.keys(byEra).filter((e) => !ERA_ORDER.includes(e) && byEra[e]?.length)
+    ), [byEra]);
 
   const [readingList, setReadingList] = useState<SavedPhilosopher[]>([]);
   const [listLoading, setListLoading] = useState(true);
@@ -126,9 +127,7 @@ export default function ArchivePage({ byEra, total }: Props) {
 
         <div className="arc-body">
           {eras.map((era) => {
-            const philosophers = [...(byEra[era] || [])].sort((a, b) =>
-              a.philosopher_name.localeCompare(b.philosopher_name)
-            );
+            const philosophers = byEra[era];
             return (
               <section key={era} className="arc-era">
                 <div className="arc-era-head">
@@ -170,6 +169,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
       const key = p.era || "Unknown";
       if (!byEra[key]) byEra[key] = [];
       byEra[key].push(p);
+    }
+    for (const key of Object.keys(byEra)) {
+      byEra[key].sort((a, b) => a.philosopher_name.localeCompare(b.philosopher_name));
     }
     return { props: { byEra, total: result.total } };
   } catch {

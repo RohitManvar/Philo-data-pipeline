@@ -393,6 +393,34 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   font-family: var(--sans); font-size: 10px; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--ink-soft); margin-top: 4px;
 }
+.np-stat-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  border-radius: 4px; transition: background 0.15s;
+}
+.np-stat-btn:hover { background: var(--paper-2); }
+.np-stat-btn.active { background: var(--paper-2); }
+.np-stat-btn.active .n { color: var(--accent); }
+.np-stat-panel {
+  margin-top: 10px; border-top: 1px solid var(--rule);
+  padding-top: 10px; max-height: 280px; overflow-y: auto;
+}
+.np-stat-panel-head {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px;
+}
+.np-stat-list { list-style: none; margin: 0; padding: 0; }
+.np-stat-list li { border-bottom: 1px solid var(--rule); }
+.np-stat-list-link {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; padding: 6px 2px; background: none; border: none; cursor: pointer;
+  font-family: var(--serif); font-size: 13px; color: var(--ink); text-decoration: none;
+  text-align: left; transition: color 0.15s;
+}
+.np-stat-list-link:hover { color: var(--accent); }
+.np-stat-list-meta {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.08em;
+  color: var(--ink-soft); text-transform: uppercase; flex-shrink: 0; margin-left: 8px;
+}
 
 /* ── Pagination ─────────────────────────────────────────── */
 .np-pager {

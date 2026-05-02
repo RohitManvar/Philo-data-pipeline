@@ -68,13 +68,14 @@ export default function Navbar({ total }: { total?: number }) {
 
   useEffect(() => {
     if (q.trim().length < 2) { setSuggestions([]); setShowSug(false); return; }
+    const controller = new AbortController();
     const t = setTimeout(() => {
-      fetch(`/api/suggest?q=${encodeURIComponent(q.trim())}`)
+      fetch(`/api/suggest?q=${encodeURIComponent(q.trim())}`, { signal: controller.signal })
         .then(r => r.json())
         .then(data => { setSuggestions(data); setShowSug(data.length > 0); })
         .catch(() => {});
     }, 250);
-    return () => clearTimeout(t);
+    return () => { clearTimeout(t); controller.abort(); };
   }, [q]);
 
   const submit = (e: React.FormEvent) => {

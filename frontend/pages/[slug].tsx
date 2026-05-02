@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
@@ -116,11 +116,11 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
     }).finally(() => { setNoteSaving(false); setNoteEdit(false); });
   };
 
-  const inits = initials(p.philosopher_name);
-  const firstName   = p.philosopher_name.split(" ")[0];
-  const ideas       = p.main_ideas    ? p.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean).slice(0, 6) : [];
-  const influencedBy = p.influenced_by ? p.influenced_by.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [];
-  const influenced   = p.influenced   ? p.influenced.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [];
+  const inits     = useMemo(() => initials(p.philosopher_name), [p.philosopher_name]);
+  const firstName = useMemo(() => p.philosopher_name.split(" ")[0], [p.philosopher_name]);
+  const ideas       = useMemo(() => p.main_ideas    ? p.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean).slice(0, 6) : [], [p.main_ideas]);
+  const influencedBy = useMemo(() => p.influenced_by ? p.influenced_by.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [], [p.influenced_by]);
+  const influenced   = useMemo(() => p.influenced   ? p.influenced.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [], [p.influenced]);
 
   return (
     <>
