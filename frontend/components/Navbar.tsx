@@ -95,7 +95,8 @@ export default function Navbar({ total }: { total?: number }) {
         <span>Search</span>
         <form onSubmit={submit}>
           <input
-            type="text"
+            id="search" name="q"
+            type="text" autoComplete="off"
             placeholder="A name, an idea, a school of thought…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
