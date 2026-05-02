@@ -81,10 +81,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   color: var(--ink-soft);
   border-bottom: 1px solid var(--rule);
   padding-bottom: 8px;
-  position: sticky; top: 0; z-index: 100;
-  background: var(--paper);
-  padding-top: 8px;
-  margin-top: -8px;
 }
 .np-topbar .left, .np-topbar .right { display: flex; gap: 18px; align-items: center; }
 @media (max-width: 640px) {
@@ -454,11 +450,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   cursor: pointer; transition: color 0.2s, border-color 0.2s;
 }
 .footer-top-btn:hover { color: var(--accent); border-color: var(--accent); }
-
-/* ── Topbar sticky shadow ────────────────────────────────── */
-.np-topbar {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
 
 /* ── Masthead quote animation ────────────────────────────── */
 @keyframes quoteIn {
