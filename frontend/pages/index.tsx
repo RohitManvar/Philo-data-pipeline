@@ -51,8 +51,28 @@ function LeadStory({ p }: { p: Philosopher }) {
   );
 }
 
-export default function Home({ result, eras, schools, query, era, school, allTotal, daily, allPhilosophers }: Props) {
-  const router     = useRouter();
+export default function Home({ result: initialResult, eras: initialEras, schools: initialSchools, query, era, school, allTotal: initialTotal, daily: initialDaily, allPhilosophers }: Props) {
+  const router = useRouter();
+  const [result, setResult]   = useState(initialResult);
+  const [eras, setEras]       = useState(initialEras);
+  const [schools, setSchools] = useState(initialSchools);
+  const [allTotal, setAllTotal] = useState(initialTotal);
+  const [daily, setDaily]     = useState(initialDaily);
+
+  // If SSR returned empty (Render was sleeping), retry client-side
+  useEffect(() => {
+    if (initialResult.total > 0) return;
+    Promise.all([
+      fetchPhilosophers(1),
+      fetchEras(),
+      fetchSchools(),
+      fetchPhilosophers(1, 1),
+      fetchDailyPhilosopher().catch(() => null),
+    ]).then(([r, e, s, all, d]) => {
+      setResult(r); setEras(e); setSchools(s); setAllTotal(all.total); setDaily(d);
+    }).catch(() => {});
+  }, [initialResult.total]);
+
   const totalPages = Math.ceil(result.total / result.limit);
   const isFiltered = !!(query || era || school);
   const lead       = !isFiltered ? result.data[0] : null;
@@ -194,16 +214,14 @@ export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
   const era    = (q.era    as string) || "";
   const school = (q.school as string) || "";
   try {
-    const [result, eras, schools, allData, daily, allList] = await Promise.all([
+    const [result, eras, schools, allData, daily] = await Promise.all([
       search ? searchPhilosophers(search, page)
              : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
              : fetchPhilosophers(page),
       fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
       fetchDailyPhilosopher().catch(() => null),
-      fetchPhilosophers(1, 500),
     ]);
-    const allPhilosophers = allList.data.slice().sort((a, b) => a.philosopher_name.localeCompare(b.philosopher_name));
-    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total, daily: daily ?? null, allPhilosophers } };
+    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total, daily: daily ?? null, allPhilosophers: [] } };
   } catch {
     return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0, daily: null, allPhilosophers: [] } };
   }

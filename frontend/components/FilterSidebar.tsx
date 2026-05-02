@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import Link from "next/link";
 import { isCleanSchool } from "../lib/clean";
-import { Philosopher } from "../lib/api";
+import { Philosopher, fetchPhilosophers } from "../lib/api";
 
 interface Props {
   eras: string[];
@@ -21,13 +21,25 @@ const QUOTES = [
 
 type Panel = "thinkers" | "eras" | "schools" | null;
 
-export default function FilterSidebar({ eras, schools, activeEra, activeSchool, total, allPhilosophers = [] }: Props) {
+export default function FilterSidebar({ eras, schools, activeEra, activeSchool, total }: Props) {
   const router  = useRouter();
   const isAll   = !activeEra && !activeSchool;
   const quote   = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length];
   const [open, setOpen] = useState<Panel>(null);
+  const [thinkers, setThinkers] = useState<Philosopher[]>([]);
+  const [thinkersLoading, setThinkersLoading] = useState(false);
 
-  const toggle = (panel: Panel) => setOpen(prev => prev === panel ? null : panel);
+  const toggle = (panel: Panel) => {
+    const next = open === panel ? null : panel;
+    setOpen(next);
+    if (next === "thinkers" && thinkers.length === 0) {
+      setThinkersLoading(true);
+      fetchPhilosophers(1, 500)
+        .then(res => setThinkers(res.data.slice().sort((a, b) => a.philosopher_name.localeCompare(b.philosopher_name))))
+        .catch(() => {})
+        .finally(() => setThinkersLoading(false));
+    }
+  };
 
   const apply = (era?: string, school?: string) => {
     const q: Record<string, string> = {};
@@ -59,19 +71,23 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
           </div>
         </div>
 
-        {open === "thinkers" && allPhilosophers.length > 0 && (
+        {open === "thinkers" && (
           <div className="np-stat-panel">
             <div className="np-stat-panel-head">All Thinkers</div>
-            <ul className="np-stat-list">
-              {allPhilosophers.map(p => (
-                <li key={p.slug}>
-                  <Link href={`/${p.slug}`} className="np-stat-list-link">
-                    <span>{p.philosopher_name}</span>
-                    {p.era && <span className="np-stat-list-meta">{p.era}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {thinkersLoading ? (
+              <div style={{ padding: "12px 0", fontFamily: "var(--sans)", fontSize: 11, color: "var(--ink-soft)", letterSpacing: "0.1em" }}>Loading…</div>
+            ) : (
+              <ul className="np-stat-list">
+                {thinkers.map(p => (
+                  <li key={p.slug}>
+                    <Link href={`/${p.slug}`} className="np-stat-list-link">
+                      <span>{p.philosopher_name}</span>
+                      {p.era && <span className="np-stat-list-meta">{p.era}</span>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 
