@@ -62,6 +62,8 @@ export default function Navbar({ total }: { total?: number }) {
     router.push(q.trim() ? `/?q=${encodeURIComponent(q.trim())}` : "/");
   };
 
+  const isMinimal = ["/profile", "/about"].includes(router.pathname);
+
   return (
     <header>
       <div className="np-topbar">
@@ -94,58 +96,61 @@ export default function Navbar({ total }: { total?: number }) {
         </div>
       </div>
 
-      <div className="np-masthead" onClick={() => router.push("/")}>
-        <div className="established">Established MMXXIV · A Daily Encyclopedia of Thought</div>
-        <h1>Enl<span className="y">y</span>ghten</h1>
-        <div className="tagline">&ldquo;All the philosophy that&rsquo;s fit to read&rdquo;</div>
-        <div className="np-byline">&ldquo;I&rsquo;m exerting myself to escape the same mind that traps me&rdquo; &mdash; rohyt</div>
-      </div>
+      {!isMinimal && (
+        <>
+          <div className="np-masthead" onClick={() => router.push("/")}>
+            <div className="established">Established MMXXIV · A Daily Encyclopedia of Thought</div>
+            <h1>Enl<span className="y">y</span>ghten</h1>
+            <div className="tagline">&ldquo;All the philosophy that&rsquo;s fit to read&rdquo;</div>
+          </div>
 
-      <div className="np-masthead-meta">
-        <span>Vol. MMXXVI &middot; No. CCCXIV</span>
-        <span className="center">The Daily Broadsheet of Ideas</span>
-        <span>{total !== undefined ? `${total} Entries` : "Price · One Thought"}</span>
-      </div>
+          <div className="np-masthead-meta">
+            <span>Vol. MMXXVI &middot; No. CCCXIV</span>
+            <span className="center">The Daily Broadsheet of Ideas</span>
+            <span>{total !== undefined ? `${total} Entries` : "Price · One Thought"}</span>
+          </div>
 
-      <div className="np-sections">
-        <Link href="/" className={"item" + (!activeEra ? " active" : "")}>All</Link>
-        {ERAS.map((era) => (
-          <Link key={era} href={`/?era=${era}`} className={"item" + (activeEra === era ? " active" : "")}>
-            {era}
-          </Link>
-        ))}
-      </div>
+          <div className="np-sections">
+            <Link href="/" className={"item" + (!activeEra ? " active" : "")}>All</Link>
+            {ERAS.map((era) => (
+              <Link key={era} href={`/?era=${era}`} className={"item" + (activeEra === era ? " active" : "")}>
+                {era}
+              </Link>
+            ))}
+          </div>
 
-      <div className="np-search-row">
-        <span>Search</span>
-        <div className="np-search-wrap" ref={sugRef}>
-          <form onSubmit={submit}>
-            <input
-              id="search" name="q"
-              type="text" autoComplete="off"
-              placeholder="A name, an idea, a school of thought…"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onFocus={() => suggestions.length > 0 && setShowSug(true)}
-            />
-          </form>
-          {showSug && (
-            <div className="np-suggestions">
-              {suggestions.map((s) => (
-                <a key={s.slug} href={`/${s.slug}`} className="np-suggestion-item" onClick={() => setShowSug(false)}>
-                  <span className="np-sug-name">{s.philosopher_name}</span>
-                  {s.era && <span className="np-sug-era">{s.era}</span>}
-                </a>
-              ))}
+          <div className="np-search-row">
+            <span>Search</span>
+            <div className="np-search-wrap" ref={sugRef}>
+              <form onSubmit={submit}>
+                <input
+                  id="search" name="q"
+                  type="text" autoComplete="off"
+                  placeholder="A name, an idea, a school of thought…"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  onFocus={() => suggestions.length > 0 && setShowSug(true)}
+                />
+              </form>
+              {showSug && (
+                <div className="np-suggestions">
+                  {suggestions.map((s) => (
+                    <a key={s.slug} href={`/${s.slug}`} className="np-suggestion-item" onClick={() => setShowSug(false)}>
+                      <span className="np-sug-name">{s.philosopher_name}</span>
+                      {s.era && <span className="np-sug-era">{s.era}</span>}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        {total !== undefined && (
-          <span style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, fontFamily: "var(--serif)" }}>
-            {total} entries
-          </span>
-        )}
-      </div>
+            {total !== undefined && (
+              <span style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, fontFamily: "var(--serif)" }}>
+                {total} entries
+              </span>
+            )}
+          </div>
+        </>
+      )}
     </header>
   );
 }
