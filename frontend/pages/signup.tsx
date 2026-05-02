@@ -46,27 +46,31 @@ export default function SignUpPage() {
 
           <form onSubmit={submit} className="auth-form">
             <div className="auth-field">
-              <label>Email</label>
+              <label htmlFor="email">Email</label>
               <input
-                type="email" required autoFocus
+                id="email" name="email"
+                type="email" required autoFocus autoComplete="email"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
               />
             </div>
             <div className="auth-field">
-              <label>Username</label>
+              <label htmlFor="username">Username</label>
               <input
-                type="text" required
+                id="username" name="username"
+                type="text" required autoComplete="username"
                 value={username} onChange={(e) => setUsername(e.target.value)}
                 placeholder="aristotle42"
                 minLength={3}
               />
             </div>
             <div className="auth-field">
-              <label>Password</label>
+              <label htmlFor="password">Password</label>
               <div className="auth-pw-wrap">
                 <input
+                  id="password" name="password"
                   type={showPw ? "text" : "password"} required
+                  autoComplete="new-password"
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   minLength={6}
