@@ -2,10 +2,12 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { cleanDate } from "../lib/clean";
 import { getSaved, toggleSave, SavedPhilosopher } from "../lib/readingList";
+import { useAuth } from "../context/AuthContext";
 
 interface Props {
   byEra: Record<string, Philosopher[]>;
@@ -15,6 +17,13 @@ interface Props {
 const ERA_ORDER = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
 export default function ArchivePage({ byEra, total }: Props) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) router.replace("/signin?next=/archive");
+  }, [user, loading, router]);
+
   const eras = ERA_ORDER.filter((e) => byEra[e]?.length).concat(
     Object.keys(byEra).filter((e) => !ERA_ORDER.includes(e) && byEra[e]?.length)
   );
@@ -26,6 +35,8 @@ export default function ArchivePage({ byEra, total }: Props) {
     toggleSave({ slug, name: "", era: null, school: null, savedAt: "" });
     setReadingList(getSaved());
   };
+
+  if (loading || !user) return null;
 
   return (
     <>

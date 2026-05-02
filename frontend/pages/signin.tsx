@@ -21,7 +21,8 @@ export default function SignInPage() {
     try {
       const data = await login(email, password);
       signin(data.access_token, data.user);
-      router.push("/");
+      const next = (router.query.next as string) || "/";
+      router.push(next);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -35,6 +36,7 @@ export default function SignInPage() {
         <title>Sign In &mdash; Enlyghten</title>
       </Head>
       <div className="auth-page">
+        <a href="/" className="auth-back">&larr; Back</a>
         <a href="/" className="auth-logo">Enl<span className="y">y</span>ghten</a>
 
         <div className="auth-card">

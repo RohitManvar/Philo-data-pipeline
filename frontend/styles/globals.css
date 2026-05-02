@@ -77,6 +77,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   font-family: var(--sans); font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
   display: flex; align-items: center; justify-content: center;
 }
+.np-user-chip { position: relative; cursor: pointer; user-select: none; }
+.np-user-caret { font-size: 10px; color: var(--ink-soft); margin-left: 2px; }
+.np-user-dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  min-width: 150px; background: var(--paper);
+  border: 1px solid var(--rule); box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column; z-index: 100;
+}
+.np-dd-item {
+  padding: 11px 18px; font-family: var(--sans); font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-soft); transition: background .12s, color .12s;
+  text-align: left; cursor: pointer; background: transparent; border-left: none; border-right: none; border-top: none;
+}
+.np-dd-item:last-child { border-bottom: none; }
+.np-dd-item:hover { background: var(--paper-2); color: var(--ink); }
+.np-dd-signout { color: var(--accent); }
 
 .np-masthead {
   text-align: center; padding: 22px 0 14px;
@@ -596,6 +613,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 
 /* ── Auth pages ─────────────────────────────────────────── */
 .auth-page {
+  position: relative;
   min-height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 40px 20px; background: var(--paper);
@@ -605,6 +623,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   background-size: 3px 3px, 7px 7px;
   background-position: 0 0, 1px 2px;
 }
+.auth-back {
+  position: absolute; top: 24px; left: 28px;
+  font-family: var(--sans); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-soft); transition: color .15s;
+}
+.auth-back:hover { color: var(--accent); }
 .auth-logo {
   font-family: var(--display); font-weight: 700; font-size: 36px;
   color: var(--ink); letter-spacing: -0.01em; margin-bottom: 32px;

@@ -36,6 +36,7 @@ export default function SignUpPage() {
         <title>Sign Up &mdash; Enlyghten</title>
       </Head>
       <div className="auth-page">
+        <a href="/" className="auth-back">&larr; Back</a>
         <a href="/" className="auth-logo">Enl<span className="y">y</span>ghten</a>
 
         <div className="auth-card">

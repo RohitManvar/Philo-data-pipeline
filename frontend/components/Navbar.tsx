@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { initials } from "./PhilosopherCard";
 
@@ -10,7 +10,17 @@ export default function Navbar({ total }: { total?: number }) {
   const router    = useRouter();
   const activeEra = (router.query.era as string) || "";
   const currentQ  = (router.query.q  as string) || "";
-  const { user }  = useAuth();
+  const { user, signout } = useAuth();
+  const [dropOpen, setDropOpen] = useState(false);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const [q, setQ]         = useState(currentQ);
   const [dateStr, setDateStr] = useState("");
@@ -37,10 +47,19 @@ export default function Navbar({ total }: { total?: number }) {
         </div>
         <div className="right">
           {user ? (
-            <Link href="/profile" className="np-user-chip">
+            <div className="np-user-chip" ref={dropRef} onClick={() => setDropOpen((v) => !v)}>
               <span className="np-user-avatar">{initials(user.username)}</span>
               <span>{user.username}</span>
-            </Link>
+              <span className="np-user-caret">▾</span>
+              {dropOpen && (
+                <div className="np-user-dropdown">
+                  <Link href="/profile" className="np-dd-item" onClick={() => setDropOpen(false)}>Profile</Link>
+                  <Link href="/archive" className="np-dd-item" onClick={() => setDropOpen(false)}>Archive</Link>
+                  <Link href="/about" className="np-dd-item" onClick={() => setDropOpen(false)}>About</Link>
+                  <button className="np-dd-item np-dd-signout" onClick={() => { signout(); setDropOpen(false); router.push("/"); }}>Sign Out</button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link href="/signin" className="np-signin-link">Sign In</Link>
           )}
