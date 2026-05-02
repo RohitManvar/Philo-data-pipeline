@@ -855,6 +855,30 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 }
 .slug-action-btn:hover { color: var(--ink); border-color: var(--rule); }
 
+/* ── Quote splash intro ──────────────────────────────────── */
+.quote-splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 1.2s ease;
+}
+.quote-splash-fade { opacity: 0; pointer-events: none; }
+.quote-splash-inner { text-align: center; padding: 40px; max-width: 560px; }
+.quote-splash-mark {
+  font-family: var(--serif); font-size: 13px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 40px;
+}
+.quote-splash-mark .y { color: var(--accent); }
+.quote-splash-text {
+  font-family: var(--serif); font-size: clamp(20px, 3vw, 28px);
+  font-style: italic; line-height: 1.6; color: var(--ink);
+  border: none; margin: 0 0 24px; padding: 0;
+}
+.quote-splash-attr {
+  font-family: var(--sans); font-size: 12px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+
 /* ── Quote card modal ────────────────────────────────────── */
 .quote-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.6);
