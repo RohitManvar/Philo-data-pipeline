@@ -75,7 +75,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 }
 .np-masthead h1 {
   font-family: var(--display); font-weight: 700;
-  font-size: clamp(48px, 9vw, 112px);
+  font-size: clamp(36px, 9vw, 112px);
   line-height: 0.9; letter-spacing: -0.01em; margin: 0;
 }
 .np-masthead h1 .y { font-style: italic; }
@@ -117,7 +117,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   font-family: var(--sans); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ink-soft);
 }
-.np-search-row form { flex: 1; display: flex; }
+.np-search-row form { flex: 1; display: flex; min-width: 0; }
+@media (max-width: 640px) {
+  .np-search-row > span { display: none; }
+  .np-search-row { padding: 10px 0; }
+}
 .np-search-row input {
   flex: 1; border: none; background: transparent;
   font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--ink);
@@ -132,7 +136,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   display: grid; grid-template-columns: 1fr 280px; gap: 36px; padding-top: 28px;
 }
 .np-body > * { min-width: 0; overflow-x: hidden; }
-@media (max-width: 900px) { .np-body { grid-template-columns: 1fr; } }
+@media (max-width: 900px) {
+  .np-body { grid-template-columns: 1fr; }
+  .np-body .np-aside { border-top: 3px double var(--rule); padding-top: 28px; }
+}
 
 /* ── Lead story ─────────────────────────────────────────── */
 .np-lead {
@@ -166,6 +173,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 .np-lead-portrait .img {
   width: 100%; aspect-ratio: 4/5; position: relative; overflow: hidden;
   filter: contrast(1.05) saturate(0.5);
+}
+@media (max-width: 700px) {
+  .np-lead-portrait .img { aspect-ratio: 16/9; }
 }
 .np-lead-portrait .img::after {
   content: ""; position: absolute; inset: 0;
@@ -216,7 +226,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   .np-article:nth-child(3n) { border-right: 1px solid var(--rule); }
   .np-article:nth-child(2n) { border-right: none; }
 }
-@media (max-width: 600px) { .np-article { border-right: none !important; } }
+@media (max-width: 600px) {
+  .np-article { border-right: none !important; padding: 16px 14px 18px; }
+}
 .np-article:hover { background: var(--paper-2); }
 .np-article .kicker {
   font-family: var(--sans); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
@@ -364,7 +376,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 }
 .np-headline-block h1 {
   font-family: var(--display); font-weight: 700;
-  font-size: clamp(42px, 6.5vw, 84px); line-height: 0.95; letter-spacing: -0.01em;
+  font-size: clamp(28px, 6.5vw, 84px); line-height: 0.95; letter-spacing: -0.01em;
   margin: 0 0 18px; max-width: 900px; margin-left: auto; margin-right: auto;
 }
 .np-headline-block .deck {
@@ -380,7 +392,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 
 .np-article-grid { display: grid; grid-template-columns: 1fr 280px; gap: 40px; }
 .np-article-grid > * { min-width: 0; }
-@media (max-width: 900px) { .np-article-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) {
+  .np-article-grid { grid-template-columns: 1fr; }
+  .np-article-grid aside { border-top: 3px double var(--rule); padding-top: 28px; }
+}
 
 .np-article-body { font-family: var(--serif); font-size: 17px; line-height: 1.7; }
 .np-article-body .lead-img {
@@ -431,6 +446,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 .np-ideas .num { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 36px; color: var(--accent); line-height: 1; }
 .np-ideas .body { font-size: 16px; line-height: 1.55; }
 .np-ideas .body em { display: block; margin-top: 4px; font-style: italic; color: var(--ink-soft); font-size: 14px; }
+@media (max-width: 600px) {
+  .np-ideas li { grid-template-columns: 40px 1fr; gap: 12px; }
+  .np-ideas .num { font-size: 26px; }
+}
 
 .np-influence { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 16px; }
 @media (max-width: 600px) { .np-influence { grid-template-columns: 1fr; } }
