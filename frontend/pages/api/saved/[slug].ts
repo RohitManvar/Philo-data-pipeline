@@ -11,6 +11,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(r.status).json(data);
   }
 
+  if (req.method === "PATCH") {
+    const { email, note } = req.body;
+    const r = await fetch(
+      `${API}/saved/${encodeURIComponent(email)}/${encodeURIComponent(slug)}/note`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note }),
+      }
+    );
+    const data = await r.json();
+    return res.status(r.status).json(data);
+  }
+
   if (req.method === "DELETE") {
     const { email } = req.body;
     const r = await fetch(`${API}/saved/${encodeURIComponent(email)}/${encodeURIComponent(slug)}`, {

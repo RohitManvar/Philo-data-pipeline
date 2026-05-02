@@ -455,6 +455,98 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 }
 .footer-top-btn:hover { color: var(--accent); border-color: var(--accent); }
 
+/* ── Topbar sticky shadow ────────────────────────────────── */
+.np-topbar {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Masthead quote animation ────────────────────────────── */
+@keyframes quoteIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Home epigraph ───────────────────────────────────────── */
+.np-epigraph {
+  text-align: center; padding: 18px 24px 0;
+  font-family: var(--display); font-style: italic;
+}
+.np-epigraph-quote {
+  font-size: clamp(14px, 2vw, 17px); color: var(--ink-2);
+}
+.np-epigraph-attr {
+  display: block; margin-top: 6px;
+  font-family: var(--sans); font-style: normal;
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ── Slug note bar ───────────────────────────────────────── */
+.slug-note-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0 4px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+  font-family: var(--sans);
+}
+.slug-note-trigger {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--serif); font-style: italic;
+  font-size: 13px; color: var(--ink-soft); padding: 0;
+}
+.slug-note-trigger:hover { color: var(--accent); }
+.slug-note-input {
+  flex: 1; border: none; border-bottom: 1px solid var(--accent);
+  background: transparent; font-family: var(--serif); font-style: italic;
+  font-size: 13px; color: var(--ink); padding: 2px 4px; outline: none;
+}
+.slug-note-save {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; background: var(--accent); color: #fff;
+  border: none; padding: 4px 10px; cursor: pointer;
+}
+.slug-note-cancel {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; background: none; color: var(--ink-soft);
+  border: none; padding: 4px 6px; cursor: pointer;
+}
+
+/* ── Archive skeleton ────────────────────────────────────── */
+.arc-skeleton { pointer-events: none; }
+.arc-skeleton-name, .arc-skeleton-meta {
+  display: inline-block; border-radius: 3px;
+  background: linear-gradient(90deg, var(--rule) 25%, var(--paper-2) 50%, var(--rule) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.arc-skeleton-name  { width: 180px; height: 13px; }
+.arc-skeleton-meta  { width: 100px; height: 11px; margin-left: 16px; }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Archive empty state ─────────────────────────────────── */
+.arc-empty {
+  text-align: center; padding: 48px 24px;
+  border: 1px dashed var(--rule); margin-bottom: 32px;
+}
+.arc-empty-icon { font-size: 36px; color: var(--ink-soft); margin-bottom: 12px; }
+.arc-empty-title {
+  font-family: var(--serif); font-size: 20px; color: var(--ink); margin-bottom: 8px;
+}
+.arc-empty-desc {
+  font-family: var(--sans); font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.04em; line-height: 1.7;
+}
+
+/* ── Archive note ────────────────────────────────────────── */
+.arc-item-with-note { flex-wrap: wrap; }
+.arc-note {
+  width: 100%; font-family: var(--serif); font-style: italic;
+  font-size: 12px; color: var(--ink-soft); padding: 2px 0 4px 0;
+}
+
 /* ── Detail page ────────────────────────────────────────── */
 .np-back {
   font-family: var(--sans); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;

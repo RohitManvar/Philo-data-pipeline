@@ -15,6 +15,10 @@ class SaveIn(BaseModel):
     school: str | None = None
 
 
+class NoteIn(BaseModel):
+    note: str
+
+
 @router.get("/{user_email}")
 def get_saved(user_email: str, db: Session = Depends(get_db)):
     items = db.query(SavedPhilosopher).filter(
@@ -26,6 +30,7 @@ def get_saved(user_email: str, db: Session = Depends(get_db)):
             "name": i.philosopher_name,
             "era": i.era,
             "school": i.school,
+            "note": i.note or "",
             "savedAt": i.saved_at.isoformat() if i.saved_at else "",
         }
         for i in items
@@ -50,6 +55,19 @@ def save_philosopher(body: SaveIn, db: Session = Depends(get_db)):
     db.add(item)
     db.commit()
     return {"saved": True}
+
+
+@router.patch("/{user_email}/{slug}/note")
+def update_note(user_email: str, slug: str, body: NoteIn, db: Session = Depends(get_db)):
+    item = db.query(SavedPhilosopher).filter(
+        SavedPhilosopher.user_email == user_email,
+        SavedPhilosopher.slug == slug,
+    ).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Not found")
+    item.note = body.note
+    db.commit()
+    return {"note": item.note}
 
 
 @router.delete("/{user_email}/{slug}")

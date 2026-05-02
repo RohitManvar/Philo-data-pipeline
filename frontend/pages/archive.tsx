@@ -32,13 +32,14 @@ export default function ArchivePage({ byEra, total }: Props) {
   );
 
   const [readingList, setReadingList] = useState<SavedPhilosopher[]>([]);
+  const [listLoading, setListLoading] = useState(true);
 
   useEffect(() => {
-    if (!session?.user?.email) return;
+    if (!session?.user?.email) { setListLoading(false); return; }
     fetch(`/api/saved/${encodeURIComponent(session.user.email)}`)
       .then(r => r.json())
-      .then(setReadingList)
-      .catch(() => {});
+      .then(data => { setReadingList(data); setListLoading(false); })
+      .catch(() => setListLoading(false));
   }, [session]);
 
   const handleRemove = async (slug: string) => {
@@ -73,7 +74,32 @@ export default function ArchivePage({ byEra, total }: Props) {
           </div>
         </div>
 
-        {readingList.length > 0 && (
+        {listLoading ? (
+          <div className="arc-reading-list">
+            <div className="arc-era-head">
+              <h2>★ Your Reading List</h2>
+            </div>
+            <ol className="arc-list">
+              {[1, 2, 3].map(i => (
+                <li key={i} className="arc-item arc-skeleton">
+                  <span className="arc-skeleton-name" />
+                  <span className="arc-skeleton-meta" />
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : readingList.length === 0 ? (
+          <div className="arc-reading-list arc-empty">
+            <div className="arc-empty-icon">☆</div>
+            <div className="arc-empty-title">Your reading list is empty</div>
+            <div className="arc-empty-desc">
+              Visit any philosopher&rsquo;s page and click <b>☆ Save</b> to build your personal archive.
+            </div>
+            <Link href="/" className="profile-action-btn" style={{ marginTop: 16, display: "inline-block" }}>
+              Start Reading &rarr;
+            </Link>
+          </div>
+        ) : (
           <div className="arc-reading-list">
             <div className="arc-era-head">
               <h2>★ Your Reading List</h2>
@@ -81,7 +107,7 @@ export default function ArchivePage({ byEra, total }: Props) {
             </div>
             <ol className="arc-list">
               {readingList.map((p) => (
-                <li key={p.slug} className="arc-item">
+                <li key={p.slug} className="arc-item arc-item-with-note">
                   <Link href={`/${p.slug}`} className="arc-link">
                     <span className="arc-name">{p.name}</span>
                     <span className="arc-rule" />
@@ -90,6 +116,7 @@ export default function ArchivePage({ byEra, total }: Props) {
                       {p.school ? ` · ${p.school}` : ""}
                     </span>
                   </Link>
+                  {p.note && <span className="arc-note">{p.note}</span>}
                   <button className="arc-remove" onClick={() => handleRemove(p.slug)} title="Remove">✕</button>
                 </li>
               ))}

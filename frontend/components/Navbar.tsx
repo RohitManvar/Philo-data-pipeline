@@ -7,15 +7,20 @@ import { initials } from "./PhilosopherCard";
 const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
 
 function MastheadQuote() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (sessionStorage.getItem("quote_shown")) return;
+    sessionStorage.setItem("quote_shown", "1");
+    setVisible(true);
     const t = setTimeout(() => setVisible(false), 3000);
     return () => clearTimeout(t);
   }, []);
 
+  if (!visible) return null;
+
   return (
-    <div className={"np-masthead-quote" + (visible ? "" : " np-masthead-quote-hide")}>
+    <div className="np-masthead-quote np-masthead-quote-hide" style={{ animation: "quoteIn 0.5s ease forwards" }}>
       &ldquo;I&rsquo;m exerting myself to escape the same mind that traps me.&rdquo;
       <span className="np-masthead-quote-attr"> &mdash; rohyt</span>
     </div>

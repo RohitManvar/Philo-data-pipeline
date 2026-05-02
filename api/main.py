@@ -11,8 +11,16 @@ from routers import auth, saved
 async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
+        # Add note column if it doesn't exist (safe to run repeatedly)
+        with engine.connect() as conn:
+            conn.execute(
+                __import__("sqlalchemy").text(
+                    "ALTER TABLE saved_philosophers ADD COLUMN IF NOT EXISTS note TEXT"
+                )
+            )
+            conn.commit()
     except Exception as e:
-        print(f"Warning: could not create tables ({e})")
+        print(f"Warning: migration step failed ({e})")
     yield
 
 app = FastAPI(title="Enlyghten API", version="1.0.0", lifespan=lifespan)

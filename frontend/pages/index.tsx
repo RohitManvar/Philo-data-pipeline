@@ -11,7 +11,7 @@ import PhilosopherCard, { eraGradient, initials } from "../components/Philosophe
 import FilterSidebar from "../components/FilterSidebar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { cleanText, cleanDate, secureUrl } from "../lib/clean";
+import { cleanText, secureUrl } from "../lib/clean";
 
 interface Props {
   result: PhilosopherList;
@@ -99,6 +99,16 @@ export default function Home({ result, eras, schools, query, era, school, allTot
             <a href="/" className="clear">Clear &times;</a>
           </div>
         )}
+
+        {daily && !isFiltered && (() => {
+          const ideas = daily.main_ideas ? daily.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [];
+          return ideas.length > 0 ? (
+            <div className="np-epigraph">
+              <span className="np-epigraph-quote">&ldquo;{ideas[0]}&rdquo;</span>
+              <span className="np-epigraph-attr">&mdash; {daily.philosopher_name}</span>
+            </div>
+          ) : null;
+        })()}
 
         {daily && !isFiltered && (
           <a href={`/${daily.slug}`} className="np-daily">

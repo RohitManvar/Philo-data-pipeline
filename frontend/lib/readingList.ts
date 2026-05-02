@@ -5,6 +5,7 @@ export interface SavedPhilosopher {
   name: string;
   era: string | null;
   school: string | null;
+  note: string;
   savedAt: string;
 }
 

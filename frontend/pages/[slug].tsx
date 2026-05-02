@@ -58,12 +58,19 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const { data: session } = useSession();
   const [saved, setSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [note, setNote] = useState("");
+  const [noteEdit, setNoteEdit] = useState(false);
+  const [noteSaving, setNoteSaving] = useState(false);
 
   useEffect(() => {
     if (!session?.user?.email) { setSaved(isSaved(p.slug)); return; }
     fetch(`/api/saved/${encodeURIComponent(session.user.email)}`)
       .then(r => r.json())
-      .then((list: { slug: string }[]) => setSaved(list.some(x => x.slug === p.slug)))
+      .then((list: { slug: string; note: string }[]) => {
+        const match = list.find(x => x.slug === p.slug);
+        setSaved(!!match);
+        if (match?.note) setNote(match.note);
+      })
       .catch(() => setSaved(isSaved(p.slug)));
   }, [p.slug, session]);
 
@@ -78,6 +85,8 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
           body: JSON.stringify({ email: session.user.email }),
         });
         setSaved(false);
+        setNote("");
+        setNoteEdit(false);
       } else {
         await fetch("/api/saved", {
           method: "POST",
@@ -95,6 +104,16 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
     } finally {
       setSaveLoading(false);
     }
+  };
+
+  const handleNoteSave = async () => {
+    if (!session?.user?.email) return;
+    setNoteSaving(true);
+    await fetch(`/api/saved/${encodeURIComponent(p.slug)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: session.user.email, note }),
+    }).finally(() => { setNoteSaving(false); setNoteEdit(false); });
   };
 
   const inits = initials(p.philosopher_name);
@@ -130,6 +149,32 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
             </div>
           </div>
 
+          {saved && session?.user?.email && (
+            <div className="slug-note-bar">
+              {noteEdit ? (
+                <>
+                  <input
+                    className="slug-note-input"
+                    value={note}
+                    onChange={e => setNote(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleNoteSave(); if (e.key === "Escape") setNoteEdit(false); }}
+                    placeholder="Add a personal note…"
+                    autoFocus
+                    maxLength={200}
+                  />
+                  <button className="slug-note-save" onClick={handleNoteSave} disabled={noteSaving}>
+                    {noteSaving ? "…" : "Save"}
+                  </button>
+                  <button className="slug-note-cancel" onClick={() => setNoteEdit(false)}>Cancel</button>
+                </>
+              ) : (
+                <button className="slug-note-trigger" onClick={() => setNoteEdit(true)}>
+                  {note ? `✎ ${note}` : "✎ Add a note…"}
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="np-headline-block np-reveal">
             <div className="kicker">{[p.era, p.school].filter(Boolean).join(" · ")}</div>
             <h1>{p.philosopher_name}</h1>
@@ -157,18 +202,6 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
 
               <div className="columns">
                 <p>{cleanText(p.intro)}</p>
-                <p>
-                  Few thinkers of the {p.era?.toLowerCase() || "modern"} period have proven so
-                  durable. What began as a quarrel with the conventions of the day became, by quiet
-                  accumulation, the architecture upon which later generations would build.
-                </p>
-                {p.school && (
-                  <p>
-                    Shaped by the {p.school} tradition, {firstName}&apos;s most distinctive moves
-                    are unmistakably their own. To read them today is to feel the friction of an
-                    honest mind at work &mdash; patient, unsparing, willing to be wrong.
-                  </p>
-                )}
               </div>
 
               {ideas.length > 0 && (

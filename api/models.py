@@ -22,6 +22,7 @@ class SavedPhilosopher(Base):
     philosopher_name = Column(Text, nullable=False)
     era             = Column(Text)
     school          = Column(Text)
+    note            = Column(Text)
     saved_at        = Column(TIMESTAMP, server_default=func.now())
 
 
