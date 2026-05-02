@@ -66,7 +66,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   padding-bottom: 8px;
 }
 .np-topbar .left, .np-topbar .right { display: flex; gap: 18px; align-items: center; }
-@media (max-width: 640px) { .np-topbar .right { display: none; } }
+@media (max-width: 640px) {
+  .np-topbar .left { display: none; }
+  .np-topbar .right { display: flex; }
+  .np-topbar { justify-content: flex-end; }
+  .np-user-chip span:not(.np-user-avatar):not(.np-user-caret) { display: none; }
+  .np-signin-link:not(:last-child) { display: none; }
+}
 .np-signin-link { color: var(--ink-soft); letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; transition: color .15s; }
 .np-signin-link:hover { color: var(--accent); }
 .np-user-chip { display: flex; align-items: center; gap: 7px; color: var(--ink-soft); transition: color .15s; }
@@ -766,6 +772,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 .profile-saved-name { font-family: var(--serif); font-size: 15px; }
 .profile-saved-era { font-family: var(--sans); font-size: 11px; letter-spacing: 0.08em; color: var(--ink-soft); text-transform: uppercase; }
 .profile-see-more { display: block; margin-top: 12px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.profile-streak-item { display: flex; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule-soft); }
+.profile-streak-num { font-family: var(--sans); font-size: 10px; color: var(--ink-soft); width: 18px; flex-shrink: 0; }
+.profile-streak-link { flex: 1; display: flex; justify-content: space-between; align-items: baseline; transition: color .15s; }
+.profile-streak-link:hover { color: var(--accent); }
+.profile-streak-date { font-family: var(--sans); font-size: 10px; color: var(--ink-soft); flex-shrink: 0; }
+.profile-discover-card { display: flex; gap: 14px; align-items: flex-start; margin-top: 4px; transition: color .15s; }
+.profile-discover-card:hover { color: var(--accent); }
+.profile-discover-img { width: 64px; height: 64px; object-fit: cover; object-position: top; flex-shrink: 0; border: 1px solid var(--rule-soft); }
+.profile-discover-name { font-family: var(--display); font-size: 18px; font-weight: 700; line-height: 1.2; }
+.profile-discover-era { font-family: var(--sans); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 6px; }
+.profile-discover-intro { font-family: var(--serif); font-size: 13px; color: var(--ink-2); line-height: 1.5; }
 
 /* ── Reveal animation ───────────────────────────────────── */
 .np-reveal {
