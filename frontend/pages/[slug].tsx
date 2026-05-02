@@ -15,6 +15,7 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const [progress, setProgress] = useState(0);
   const [copied, setCopied]     = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [imgOpen, setImgOpen]   = useState(false);
 
   // Reading progress bar
   useEffect(() => {
@@ -189,7 +190,11 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
 
           <div className="np-article-grid">
             <article className="np-article-body">
-              <div className="lead-img" style={{ background: eraGradient(p.era) }}>
+              <div
+                className={"lead-img" + (secureUrl(p.image_url) ? " lead-img-clickable" : "")}
+                style={{ background: eraGradient(p.era) }}
+                onClick={() => secureUrl(p.image_url) && setImgOpen(true)}
+              >
                 {secureUrl(p.image_url) ? (
                   <img src={secureUrl(p.image_url)!} alt={p.philosopher_name} />
                 ) : (
@@ -304,6 +309,21 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
                 target="_blank" rel="noopener noreferrer">Share on X</a>
               <button onClick={() => setQuoteOpen(false)}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {imgOpen && secureUrl(p.image_url) && (
+        <div className="img-lightbox" onClick={() => setImgOpen(false)}>
+          <button className="img-lightbox-close" onClick={() => setImgOpen(false)}>✕</button>
+          <img
+            src={secureUrl(p.image_url)!}
+            alt={p.philosopher_name}
+            className="img-lightbox-photo"
+            onClick={e => e.stopPropagation()}
+          />
+          <div className="img-lightbox-caption" onClick={e => e.stopPropagation()}>
+            {p.philosopher_name}{p.era ? ` · ${p.era}` : ""}
           </div>
         </div>
       )}

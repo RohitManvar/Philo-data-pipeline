@@ -610,6 +610,38 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden;
   margin-bottom: 8px; filter: contrast(1.1) saturate(0.3);
 }
+.lead-img-clickable { cursor: zoom-in; }
+.lead-img-clickable:hover { filter: contrast(1.1) saturate(0.5); transition: filter 0.2s; }
+
+/* ── Image lightbox ──────────────────────────────────────── */
+.img-lightbox {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.88);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: zoom-out; padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.img-lightbox-close {
+  position: fixed; top: 20px; right: 24px;
+  background: none; border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 18px; width: 40px; height: 40px;
+  cursor: pointer; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.img-lightbox-close:hover { background: rgba(255,255,255,0.15); }
+.img-lightbox-photo {
+  max-width: min(700px, 90vw); max-height: 78vh;
+  object-fit: contain; cursor: default;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.img-lightbox-caption {
+  margin-top: 16px; font-family: var(--sans);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); cursor: default;
+}
 .np-article-body .lead-img::after {
   content: ""; position: absolute; inset: 0;
   background-image: radial-gradient(rgba(0,0,0,0.45) 1px, transparent 1.2px);
