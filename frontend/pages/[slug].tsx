@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { eraGradient, initials } from "../components/PhilosopherCard";
 import { cleanText, cleanDate, secureUrl } from "../lib/clean";
 import { isSaved } from "../lib/readingList";
@@ -248,10 +249,7 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
           </div>
         </div>
 
-        <footer className="footer">
-          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read</div>
-        </footer>
+        <Footer />
       </div>
 
       {/* Quote card modal */}

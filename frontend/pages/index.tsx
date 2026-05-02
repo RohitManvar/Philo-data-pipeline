@@ -10,6 +10,7 @@ import {
 import PhilosopherCard, { eraGradient, initials } from "../components/PhilosopherCard";
 import FilterSidebar from "../components/FilterSidebar";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { cleanText, cleanDate, secureUrl } from "../lib/clean";
 
 interface Props {
@@ -158,10 +159,7 @@ export default function Home({ result, eras, schools, query, era, school, allTot
           <FilterSidebar eras={eras} schools={schools} activeEra={era} activeSchool={school} total={allTotal} />
         </div>
 
-        <footer className="footer">
-          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read</div>
-        </footer>
+        <Footer />
       </div>
     </>
   );

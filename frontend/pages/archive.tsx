@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchPhilosophers, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { cleanDate } from "../lib/clean";
 import { SavedPhilosopher } from "../lib/readingList";
 import { useSession } from "next-auth/react";
@@ -128,10 +129,7 @@ export default function ArchivePage({ byEra, total }: Props) {
           })}
         </div>
 
-        <footer className="footer">
-          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read</div>
-        </footer>
+        <Footer />
       </div>
     </>
   );

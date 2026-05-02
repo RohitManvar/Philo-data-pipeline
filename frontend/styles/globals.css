@@ -421,6 +421,29 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
 }
 .footer .mark .y { font-style: italic; }
 .footer .accent { color: var(--accent); }
+.footer-links {
+  margin-top: 14px; display: flex; gap: 10px; align-items: center;
+  justify-content: center; flex-wrap: wrap;
+}
+.footer-links a {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-soft);
+  text-decoration: none;
+}
+.footer-links a:hover { color: var(--accent); }
+.footer-sep { color: var(--rule); }
+.footer-meta {
+  margin-top: 10px; font-family: var(--sans); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--rule);
+}
+.footer-top-btn {
+  display: inline-block; margin-top: 18px;
+  font-family: var(--sans); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-soft);
+  background: none; border: 1px solid var(--rule); padding: 6px 16px;
+  cursor: pointer; transition: color 0.2s, border-color 0.2s;
+}
+.footer-top-btn:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ── Detail page ────────────────────────────────────────── */
 .np-back {

@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function AboutPage() {
   return (
@@ -89,10 +90,7 @@ export default function AboutPage() {
           </aside>
         </div>
 
-        <footer className="footer">
-          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read</div>
-        </footer>
+        <Footer />
       </div>
     </>
   );

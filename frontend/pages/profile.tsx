@@ -9,6 +9,7 @@ import { SavedPhilosopher } from "../lib/readingList";
 import { Philosopher } from "../lib/api";
 import { cleanText, secureUrl } from "../lib/clean";
 import { getTheme, toggleTheme } from "../lib/theme";
+import Footer from "../components/Footer";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -177,10 +178,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <footer className="footer">
-          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
-          <div>All the philosophy that&rsquo;s fit to read</div>
-        </footer>
+        <Footer />
       </div>
     </>
   );
