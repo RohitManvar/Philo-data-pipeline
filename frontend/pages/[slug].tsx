@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { fetchPhilosopher, Philosopher } from "../lib/api";
 import Navbar from "../components/Navbar";
@@ -11,6 +11,32 @@ import { isSaved } from "../lib/readingList";
 
 export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [copied, setCopied]     = useState(false);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+
+  // Reading progress bar
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement;
+      const pct = el.scrollTop / (el.scrollHeight - el.clientHeight);
+      setProgress(Math.min(100, Math.round(pct * 100)));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    const text = `${p.philosopher_name} — ${cleanText(p.intro)?.slice(0, 100)}…`;
+    if (navigator.share) {
+      await navigator.share({ title: p.philosopher_name, text, url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [p]);
 
   useEffect(() => {
     const el = ref.current;
@@ -84,14 +110,23 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
       </Head>
 
       <div className="np-shell">
+        {/* Reading progress bar */}
+        <div className="np-progress-bar" style={{ width: `${progress}%` }} />
+
         <Navbar />
 
         <div ref={ref}>
           <div className="slug-topbar">
             <Link href="/" className="np-back">&larr; Return to Front Page</Link>
-            <button className={"save-btn" + (saved ? " saved" : "")} onClick={handleSave} disabled={saveLoading}>
-              {saveLoading ? "…" : saved ? "★ Saved to Archive" : "☆ Save to Archive"}
-            </button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button className="slug-action-btn" onClick={() => setQuoteOpen(true)} title="Quote card">&#10075;</button>
+              <button className="slug-action-btn" onClick={handleShare} title="Share">
+                {copied ? "✓ Copied" : "↗ Share"}
+              </button>
+              <button className={"save-btn" + (saved ? " saved" : "")} onClick={handleSave} disabled={saveLoading}>
+                {saveLoading ? "…" : saved ? "★ Saved" : "☆ Save"}
+              </button>
+            </div>
           </div>
 
           <div className="np-headline-block np-reveal">
@@ -218,6 +253,29 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
           <div>All the philosophy that&rsquo;s fit to read</div>
         </footer>
       </div>
+
+      {/* Quote card modal */}
+      {quoteOpen && ideas.length > 0 && (
+        <div className="quote-overlay" onClick={() => setQuoteOpen(false)}>
+          <div className="quote-card" onClick={e => e.stopPropagation()}>
+            <div className="quote-card-inner">
+              <div className="quote-card-mark">Enl<span className="y">y</span>ghten</div>
+              <blockquote className="quote-card-text">&ldquo;{ideas[0]}&rdquo;</blockquote>
+              <div className="quote-card-attr">&mdash; {p.philosopher_name}</div>
+              {p.era && <div className="quote-card-era">{p.era}</div>}
+            </div>
+            <div className="quote-card-actions">
+              <button onClick={async () => {
+                await navigator.clipboard.writeText(`"${ideas[0]}" — ${p.philosopher_name}\n\nenlyghten.vercel.app/${p.slug}`);
+                setCopied(true); setTimeout(() => setCopied(false), 2000);
+              }}>{copied ? "✓ Copied!" : "Copy Quote"}</button>
+              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${ideas[0]}" — ${p.philosopher_name}`)}&url=${encodeURIComponent(`https://philo-data-pipeline.vercel.app/${p.slug}`)}`}
+                target="_blank" rel="noopener noreferrer">Share on X</a>
+              <button onClick={() => setQuoteOpen(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

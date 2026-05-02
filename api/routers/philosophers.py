@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
+from datetime import date
 
 import sys
 sys.path.append("..")
@@ -62,6 +63,26 @@ def filter_philosophers(
     total = query.count()
     items = query.offset(offset).limit(limit).all()
     return {"total": total, "page": page, "limit": limit, "data": items}
+
+
+@router.get("/random", response_model=PhilosopherOut)
+def random_philosopher(db: Session = Depends(get_db)):
+    item = db.query(Philosopher).order_by(func.random()).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="No philosophers found")
+    return item
+
+
+@router.get("/daily", response_model=PhilosopherOut)
+def daily_philosopher(db: Session = Depends(get_db)):
+    total = db.query(func.count(Philosopher.id)).scalar()
+    if not total:
+        raise HTTPException(status_code=404, detail="No philosophers found")
+    day_index = date.today().toordinal() % total
+    item = db.query(Philosopher).order_by(Philosopher.id).offset(day_index).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Not found")
+    return item
 
 
 @router.get("/{slug}", response_model=PhilosopherOut)

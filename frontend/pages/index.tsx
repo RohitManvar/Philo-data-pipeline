@@ -1,9 +1,11 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   fetchPhilosophers, searchPhilosophers, filterPhilosophers,
-  fetchEras, fetchSchools, PhilosopherList, Philosopher,
+  fetchEras, fetchSchools, fetchDailyPhilosopher, fetchRandomPhilosopher,
+  PhilosopherList, Philosopher,
 } from "../lib/api";
 import PhilosopherCard, { eraGradient, initials } from "../components/PhilosopherCard";
 import FilterSidebar from "../components/FilterSidebar";
@@ -18,6 +20,7 @@ interface Props {
   era: string;
   school: string;
   allTotal: number;
+  daily: Philosopher | null;
 }
 
 function LeadStory({ p }: { p: Philosopher }) {
@@ -46,11 +49,21 @@ function LeadStory({ p }: { p: Philosopher }) {
   );
 }
 
-export default function Home({ result, eras, schools, query, era, school, allTotal }: Props) {
+export default function Home({ result, eras, schools, query, era, school, allTotal, daily }: Props) {
+  const router     = useRouter();
   const totalPages = Math.ceil(result.total / result.limit);
   const isFiltered = !!(query || era || school);
   const lead       = !isFiltered ? result.data[0] : null;
   const grid       = !isFiltered ? result.data.slice(1) : result.data;
+  const [surprising, setSurprising] = useState(false);
+
+  const handleSurprise = async () => {
+    setSurprising(true);
+    try {
+      const p = await fetchRandomPhilosopher();
+      router.push(`/${p.slug}`);
+    } catch { setSurprising(false); }
+  };
 
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>(".np-reveal:not(.in)");
@@ -86,6 +99,14 @@ export default function Home({ result, eras, schools, query, era, school, allTot
           </div>
         )}
 
+        {daily && !isFiltered && (
+          <a href={`/${daily.slug}`} className="np-daily">
+            <span className="np-daily-label">&#9788; Philosopher of the Day</span>
+            <span className="np-daily-name">{daily.philosopher_name}</span>
+            <span className="np-daily-era">{daily.era || "Philosophy"}</span>
+          </a>
+        )}
+
         <div className="np-body">
           <main>
             {lead && <LeadStory p={lead} />}
@@ -99,6 +120,11 @@ export default function Home({ result, eras, schools, query, era, school, allTot
               </h3>
               <span className="rule" />
               <span className="meta">{result.total} entries</span>
+              {!isFiltered && (
+                <button className="np-surprise" onClick={handleSurprise} disabled={surprising}>
+                  {surprising ? "…" : "⚄ Surprise Me"}
+                </button>
+              )}
             </div>
 
             {grid.length === 0 && !lead ? (
@@ -159,14 +185,15 @@ export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
   const era    = (q.era    as string) || "";
   const school = (q.school as string) || "";
   try {
-    const [result, eras, schools, allData] = await Promise.all([
+    const [result, eras, schools, allData, daily] = await Promise.all([
       search ? searchPhilosophers(search, page)
              : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
              : fetchPhilosophers(page),
       fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
+      fetchDailyPhilosopher().catch(() => null),
     ]);
-    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total } };
+    return { props: { result, eras, schools, query: search, era, school, allTotal: allData.total, daily: daily ?? null } };
   } catch {
-    return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0 } };
+    return { props: { result: EMPTY_LIST, eras: [], schools: [], query: search, era, school, allTotal: 0, daily: null } };
   }
 };

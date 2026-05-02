@@ -8,6 +8,7 @@ import { initials } from "../components/PhilosopherCard";
 import { SavedPhilosopher } from "../lib/readingList";
 import { Philosopher } from "../lib/api";
 import { cleanText, secureUrl } from "../lib/clean";
+import { getTheme, toggleTheme } from "../lib/theme";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -19,6 +20,8 @@ export default function ProfilePage() {
 
   const [saved, setSaved]         = useState<SavedPhilosopher[]>([]);
   const [suggest, setSuggest]     = useState<Philosopher | null>(null);
+  const [theme, setTheme]         = useState<"light"|"dark">("light");
+  useEffect(() => { setTheme(getTheme()); }, []);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/signin");
@@ -105,6 +108,11 @@ export default function ProfilePage() {
             </div>
 
             <Link href="/archive" className="profile-action-btn" style={{ marginTop: 16 }}>Browse Archive &rarr;</Link>
+            <button className="profile-action-btn profile-theme-btn" style={{ marginTop: 8 }} onClick={() => {
+              const next = toggleTheme(); setTheme(next);
+            }}>
+              {theme === "dark" ? "☀ Light Mode" : "☽ Dark Mode"}
+            </button>
             <button className="profile-signout" onClick={() => signOut({ callbackUrl: "/" })}>Sign Out</button>
           </div>
 

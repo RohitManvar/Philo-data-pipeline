@@ -51,6 +51,18 @@ export async function filterPhilosophers(era?: string, school?: string, page = 1
   return res.json();
 }
 
+export async function fetchRandomPhilosopher(): Promise<Philosopher> {
+  const res = await fetch(`${API_BASE}/philosophers/random`);
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json();
+}
+
+export async function fetchDailyPhilosopher(): Promise<Philosopher> {
+  const res = await fetch(`${API_BASE}/philosophers/daily`);
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json();
+}
+
 export async function fetchEras(): Promise<string[]> {
   const res = await fetch(`${API_BASE}/categories/eras`);
   if (!res.ok) throw new Error("Failed to fetch eras");

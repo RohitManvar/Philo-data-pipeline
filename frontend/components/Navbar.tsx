@@ -23,8 +23,19 @@ export default function Navbar({ total }: { total?: number }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const [q, setQ]         = useState(currentQ);
-  const [dateStr, setDateStr] = useState("");
+  const [q, setQ]               = useState(currentQ);
+  const [dateStr, setDateStr]   = useState("");
+  const [suggestions, setSuggestions] = useState<{slug:string; philosopher_name:string; era:string|null}[]>([]);
+  const [showSug, setShowSug]   = useState(false);
+  const sugRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (sugRef.current && !sugRef.current.contains(e.target as Node)) setShowSug(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     setDateStr(new Date().toLocaleDateString("en-US", {
@@ -34,8 +45,20 @@ export default function Navbar({ total }: { total?: number }) {
 
   useEffect(() => { setQ(currentQ); }, [currentQ]);
 
+  useEffect(() => {
+    if (q.trim().length < 2) { setSuggestions([]); setShowSug(false); return; }
+    const t = setTimeout(() => {
+      fetch(`/api/suggest?q=${encodeURIComponent(q.trim())}`)
+        .then(r => r.json())
+        .then(data => { setSuggestions(data); setShowSug(data.length > 0); })
+        .catch(() => {});
+    }, 250);
+    return () => clearTimeout(t);
+  }, [q]);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowSug(false);
     router.push(q.trim() ? `/?q=${encodeURIComponent(q.trim())}` : "/");
   };
 
@@ -95,15 +118,28 @@ export default function Navbar({ total }: { total?: number }) {
 
       <div className="np-search-row">
         <span>Search</span>
-        <form onSubmit={submit}>
-          <input
-            id="search" name="q"
-            type="text" autoComplete="off"
-            placeholder="A name, an idea, a school of thought…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-        </form>
+        <div className="np-search-wrap" ref={sugRef}>
+          <form onSubmit={submit}>
+            <input
+              id="search" name="q"
+              type="text" autoComplete="off"
+              placeholder="A name, an idea, a school of thought…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onFocus={() => suggestions.length > 0 && setShowSug(true)}
+            />
+          </form>
+          {showSug && (
+            <div className="np-suggestions">
+              {suggestions.map((s) => (
+                <a key={s.slug} href={`/${s.slug}`} className="np-suggestion-item" onClick={() => setShowSug(false)}>
+                  <span className="np-sug-name">{s.philosopher_name}</span>
+                  {s.era && <span className="np-sug-era">{s.era}</span>}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
         {total !== undefined && (
           <span style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, fontFamily: "var(--serif)" }}>
             {total} entries

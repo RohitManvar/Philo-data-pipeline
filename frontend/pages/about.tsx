@@ -83,7 +83,7 @@ export default function AboutPage() {
                 <dt>Data Pipeline</dt>
                 <dd>Rohit Manvar</dd>
                 <dt>Design</dt>
-                <dd>Newspaper broadsheet, 2024</dd>
+                <dd>Newspaper broadsheet, 2026</dd>
               </dl>
             </div>
           </aside>
