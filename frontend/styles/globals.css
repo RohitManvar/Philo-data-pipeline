@@ -684,6 +684,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: transp
   letter-spacing: 0.04em; padding: 8px 12px; border: 1px solid var(--accent);
   background: rgba(138,31,31,0.04);
 }
+.google-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%; margin-top: 12px; padding: 14px;
+  background: #fff; color: #3c3c3c;
+  border: 1px solid #dadce0; border-radius: 2px;
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: box-shadow .15s, background .15s;
+}
+.google-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); background: #f8f8f8; }
 .auth-btn {
   margin-top: 6px; padding: 14px;
   background: var(--ink); color: var(--paper);
