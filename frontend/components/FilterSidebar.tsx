@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import Counter from "./Counter";
+import { isCleanSchool } from "../lib/clean";
 
 interface Props {
   eras: string[];
@@ -9,28 +9,16 @@ interface Props {
   total: number;
 }
 
-const SWATCH: Record<string, string> = {
-  ancient:       "#818cf8",
-  medieval:      "#c4b5fd",
-  renaissance:   "#f9a8d4",
-  enlightenment: "#7dd3fc",
-  modern:        "#93c5fd",
-  contemporary:  "#6ee7b7",
-  eastern:       "#fcd34d",
-  islamic:       "#5eead4",
-  african:       "#fde047",
-};
-
-function swatchColor(era: string): string {
-  const key = era.toLowerCase();
-  for (const [k, v] of Object.entries(SWATCH)) {
-    if (key.includes(k)) return v;
-  }
-  return "#94a3b8";
-}
+const QUOTES = [
+  { text: "The unexamined life is not worth living.", who: "Socrates" },
+  { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", who: "Aristotle" },
+  { text: "I think, therefore I am.", who: "Descartes" },
+];
 
 export default function FilterSidebar({ eras, schools, activeEra, activeSchool, total }: Props) {
-  const router = useRouter();
+  const router  = useRouter();
+  const isAll   = !activeEra && !activeSchool;
+  const quote   = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length];
 
   const apply = (era?: string, school?: string) => {
     const q: Record<string, string> = {};
@@ -39,59 +27,70 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
     router.push({ pathname: "/", query: q });
   };
 
-  const isAll = !activeEra && !activeSchool;
-
   return (
-    <aside className="w-56 shrink-0">
-      <div className="side-card text-center">
-        <div className="side-stat" style={{ justifyContent: "center" }}>
-          <span className="num"><Counter value={total} /></span>
-        </div>
-        <span className="lab" style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--ink-soft)" }}>Thinkers</span>
-        <p className="side-meta">Across {eras.length} eras · {schools.length} schools</p>
-      </div>
-
-      <div className="side-card" style={{ padding: 8 }}>
-        <button onClick={() => router.push("/")} className={`era-item${isAll ? " active" : ""}`}>
-          <span className="left">
-            <span className="swatch" style={{ background: "#6366f1", color: "#6366f1" }} />
-            All Philosophers
-          </span>
-          <span className="count">{total}</span>
-        </button>
-      </div>
-
-      {eras.length > 0 && (
-        <div className="side-card">
-          <p className="side-h">By Era</p>
-          {eras.map((era) => (
-            <button key={era} onClick={() => apply(era)} className={`era-item${activeEra === era ? " active" : ""}`}>
-              <span className="left">
-                <span className="swatch" style={{ background: swatchColor(era), color: swatchColor(era) }} />
-                {era}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {schools.length > 0 && (
-        <div className="side-card">
-          <p className="side-h">By School</p>
-          <div className="school-list">
-            {schools.slice(0, 28).map((school) => (
-              <button
-                key={school}
-                onClick={() => apply(undefined, school)}
-                className={`school-item${activeSchool === school ? " active" : ""}`}
-                style={activeSchool === school ? { background: "rgba(99,102,241,0.15)", color: "#c7d2fe", borderColor: "rgba(99,102,241,0.35)" } : {}}
-              >
-                {school}
-              </button>
-            ))}
+    <aside className="np-aside">
+      <div className="np-aside-block">
+        <div className="head">By the Numbers</div>
+        <div className="np-stats">
+          <div>
+            <div className="n">{total}</div>
+            <div className="l">Thinkers</div>
+          </div>
+          <div>
+            <div className="n">{eras.length}</div>
+            <div className="l">Eras</div>
+          </div>
+          <div>
+            <div className="n">{schools.length}</div>
+            <div className="l">Schools</div>
+          </div>
+          <div>
+            <div className="n">∞</div>
+            <div className="l">Questions</div>
           </div>
         </div>
+      </div>
+
+      <div className="np-aside-block">
+        <div className="head">Sections of the Paper</div>
+        <ul className="np-era-list">
+          <li className={isAll ? "active" : ""} onClick={() => router.push("/")}>
+            <span>All Departments</span>
+            <span className="num">{total}</span>
+          </li>
+          {eras.map((era) => (
+            <li key={era} className={activeEra === era ? "active" : ""} onClick={() => apply(era)}>
+              <span>{era}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {schools.length > 0 && (
+        <div className="np-aside-block">
+          <div className="head">Schools of Thought</div>
+          <ul className="np-era-list">
+            {schools.filter(isCleanSchool).slice(0, 12).map((school) => (
+              <li
+                key={school}
+                className={activeSchool === school ? "active" : ""}
+                onClick={() => apply(undefined, school)}
+                style={{ fontSize: 13.5 }}
+              >
+                <span>{school}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+
+      <div className="np-aside-block">
+        <div className="head">Quotation of the Day</div>
+        <div className="np-quote">
+          {quote.text}
+          <span className="who">&mdash; {quote.who}</span>
+        </div>
+      </div>
     </aside>
   );
 }

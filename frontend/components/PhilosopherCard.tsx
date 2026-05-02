@@ -2,61 +2,73 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Philosopher } from "../lib/api";
-import EraTag from "./EraTag";
+import { cleanText, cleanDate } from "../lib/clean";
+
+const ERA_GRADIENTS: Record<string, string> = {
+  ancient:       "linear-gradient(135deg, #8b6f3f, #c9a878)",
+  medieval:      "linear-gradient(135deg, #6b4a8a, #a888c0)",
+  renaissance:   "linear-gradient(135deg, #b8456e, #e89db5)",
+  enlightenment: "linear-gradient(135deg, #3b7bd0, #8fb8e8)",
+  modern:        "linear-gradient(135deg, #2f8a6b, #7fc0a8)",
+  contemporary:  "linear-gradient(135deg, #3970b8, #87aedb)",
+  eastern:       "linear-gradient(135deg, #8a6a1f, #d4a83c)",
+};
+
+export function eraGradient(era: string | null): string {
+  if (!era) return "linear-gradient(135deg, #4a4a4a, #888)";
+  const key = era.toLowerCase();
+  for (const [k, v] of Object.entries(ERA_GRADIENTS)) {
+    if (key.includes(k)) return v;
+  }
+  return "linear-gradient(135deg, #4a4a4a, #888)";
+}
+
+export function initials(name: string): string {
+  return name.split(/\s+/).map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+}
 
 export default function PhilosopherCard({ p, index = 0 }: { p: Philosopher; index?: number }) {
   const ref = useRef<HTMLAnchorElement>(null);
-  const initials = p.philosopher_name
-    .split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
-  // Scroll-triggered entrance
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const delay = (index % 6) * 60;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          setTimeout(() => e.target.classList.add("in"), delay);
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    const delay = (index % 9) * 60;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add("in"), delay);
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.06 }
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [index, p.id]);
 
-  // Magnetic cursor glow
-  const onMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const r = ref.current!.getBoundingClientRect();
-    ref.current!.style.setProperty("--mx", (e.clientX - r.left) + "px");
-    ref.current!.style.setProperty("--my", (e.clientY - r.top) + "px");
-  };
-
   return (
-    <Link href={`/${p.slug}`} className="card" ref={ref} onMouseMove={onMouseMove}>
-      <div className="card-img">
+    <Link href={`/${p.slug}`} className="np-article" ref={ref}>
+      <div className="kicker">{[p.era, p.school].filter(Boolean).join(" · ")}</div>
+      <div className="np-portrait" style={{ background: eraGradient(p.era) }}>
         {p.image_url ? (
-          <div className="bg w-full h-full relative">
-            <Image src={p.image_url} alt={p.philosopher_name} fill className="object-cover object-top" unoptimized />
-          </div>
+          <Image src={p.image_url} alt={p.philosopher_name} fill unoptimized />
         ) : (
-          <div className="initials">{initials}</div>
+          <div className="initials">{initials(p.philosopher_name)}</div>
         )}
-        <EraTag era={p.era} />
-        <div className="shine" />
       </div>
-
-      <div className="card-body">
-        <h3 className="card-name">{p.philosopher_name}</h3>
-        {(p.birth || p.school) && (
-          <p className="card-years">
-            {[p.birth && `b. ${p.birth}`, p.school].filter(Boolean).join(" · ")}
-          </p>
-        )}
-        <p className="card-intro">{p.intro}</p>
-        <span className="read-more">Read more <span className="arrow">→</span></span>
-      </div>
+      <h4>{p.philosopher_name}</h4>
+      {(p.birth || p.death) && (
+        <div className="dates">
+          {p.birth && `b. ${cleanDate(p.birth)}`}
+          {p.birth && p.death && " · "}
+          {p.death && `d. ${cleanDate(p.death)}`}
+        </div>
+      )}
+      <p>{cleanText(p.intro)}</p>
+      <div className="byline">By <strong>The Editors</strong> · 6 min read</div>
     </Link>
   );
 }

@@ -1,33 +1,80 @@
 import Link from "next/link";
-import SearchBar from "./SearchBar";
-import ThemeToggle from "./ThemeToggle";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 
-export default function Navbar({ showSearch = false }: { showSearch?: boolean }) {
+const ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
+
+export default function Navbar({ total }: { total?: number }) {
+  const router    = useRouter();
+  const activeEra = (router.query.era as string) || "";
+  const currentQ  = (router.query.q  as string) || "";
+
+  const [q, setQ]         = useState(currentQ);
+  const [dateStr, setDateStr] = useState("");
+
+  useEffect(() => {
+    setDateStr(new Date().toLocaleDateString("en-US", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric",
+    }));
+  }, []);
+
+  useEffect(() => { setQ(currentQ); }, [currentQ]);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push(q.trim() ? `/?q=${encodeURIComponent(q.trim())}` : "/");
+  };
+
   return (
-    <nav className="nav">
-      <div className="nav-inner">
-        <Link href="/" className="logo">
-          <span className="logo-mark">
-            Enlyghten<span className="dot">.</span>
-          </span>
-          <span className="logo-sub hidden sm:block">Encyclopedia of Thought</span>
-        </Link>
-
-        {showSearch && (
-          <div className="nav-search">
-            <SearchBar compact />
-          </div>
-        )}
-
-        <div className="nav-eras hidden sm:flex">
-          <Link href="/" className="nav-era">All</Link>
-          <Link href="/?era=Ancient" className="nav-era">Ancient</Link>
-          <Link href="/?era=Modern" className="nav-era">Modern</Link>
-          <Link href="/?era=Eastern" className="nav-era">Eastern</Link>
+    <header>
+      <div className="np-topbar">
+        <div className="left">
+          <span>{dateStr || "—"}</span>
+          <span>Edition · Web</span>
         </div>
-
-        <ThemeToggle />
+        <div className="right">
+          <span>Archive</span>
+          <span>About</span>
+        </div>
       </div>
-    </nav>
+
+      <div className="np-masthead" onClick={() => router.push("/")}>
+        <div className="established">Established MMXXIV · A Daily Encyclopedia of Thought</div>
+        <h1>Enl<span className="y">y</span>ghten</h1>
+        <div className="tagline">&ldquo;All the philosophy that&rsquo;s fit to read&rdquo;</div>
+      </div>
+
+      <div className="np-masthead-meta">
+        <span>Vol. MMXXVI &middot; No. CCCXIV</span>
+        <span className="center">The Daily Broadsheet of Ideas</span>
+        <span>{total !== undefined ? `${total} Entries` : "Price · One Thought"}</span>
+      </div>
+
+      <div className="np-sections">
+        <Link href="/" className={"item" + (!activeEra ? " active" : "")}>All</Link>
+        {ERAS.map((era) => (
+          <Link key={era} href={`/?era=${era}`} className={"item" + (activeEra === era ? " active" : "")}>
+            {era}
+          </Link>
+        ))}
+      </div>
+
+      <div className="np-search-row">
+        <span>Search</span>
+        <form onSubmit={submit}>
+          <input
+            type="text"
+            placeholder="A name, an idea, a school of thought…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </form>
+        {total !== undefined && (
+          <span style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, fontFamily: "var(--serif)" }}>
+            {total} entries
+          </span>
+        )}
+      </div>
+    </header>
   );
 }

@@ -1,28 +1,14 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import {
   fetchPhilosophers, searchPhilosophers, filterPhilosophers,
-  fetchEras, fetchSchools, PhilosopherList,
+  fetchEras, fetchSchools, PhilosopherList, Philosopher,
 } from "../lib/api";
-import PhilosopherCard from "../components/PhilosopherCard";
-import SearchBar from "../components/SearchBar";
+import PhilosopherCard, { eraGradient, initials } from "../components/PhilosopherCard";
 import FilterSidebar from "../components/FilterSidebar";
 import Navbar from "../components/Navbar";
-import EmptyState from "../components/EmptyState";
-import FloatingParticles from "../components/FloatingParticles";
-import TypewriterText from "../components/TypewriterText";
-
-const QUOTES = [
-  { text: "The unexamined life is not worth living.", author: "Socrates" },
-  { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
-  { text: "I think, therefore I am.", author: "René Descartes" },
-  { text: "He who has a why to live for can bear almost any how.", author: "Friedrich Nietzsche" },
-  { text: "Man is condemned to be free.", author: "Jean-Paul Sartre" },
-  { text: "What is rational is actual; what is actual is rational.", author: "Hegel" },
-  { text: "The mind is not a vessel to be filled, but a fire to be kindled.", author: "Plutarch" },
-  { text: "Happiness is the meaning and the purpose of life, the whole aim of human existence.", author: "Aristotle" },
-];
+import { cleanText, cleanDate } from "../lib/clean";
 
 interface Props {
   result: PhilosopherList;
@@ -34,170 +20,128 @@ interface Props {
   allTotal: number;
 }
 
+function LeadStory({ p }: { p: Philosopher }) {
+  const inits = initials(p.philosopher_name);
+  return (
+    <a href={`/${p.slug}`} className="np-lead">
+      <div>
+        <div className="kicker">&#9733; Lead Story &middot; {p.era || "Philosophy"}</div>
+        <h2>{p.philosopher_name}</h2>
+        <div className="deck">{cleanText(p.intro)?.split(".")[0]}.</div>
+        <div className="lede">{cleanText(p.intro)}</div>
+      </div>
+      <div className="np-lead-portrait">
+        <div className="img" style={{ background: eraGradient(p.era) }}>
+          <div className="initials">{inits}</div>
+        </div>
+        <div className="caption">
+          {p.philosopher_name} &middot; {p.era || "Philosopher"} &middot; From the Enlyghten archive.
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function Home({ result, eras, schools, query, era, school, allTotal }: Props) {
   const totalPages = Math.ceil(result.total / result.limit);
   const isFiltered = !!(query || era || school);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const lead       = !isFiltered ? result.data[0] : null;
+  const grid       = !isFiltered ? result.data.slice(1) : result.data;
 
-  // Reveal cards
   useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".reveal:not(.in)");
-    const io = new IntersectionObserver(
+    const els = document.querySelectorAll<HTMLElement>(".np-reveal:not(.in)");
+    const io  = new IntersectionObserver(
       (entries) => entries.forEach((e) => {
         if (e.isIntersecting) { (e.target as HTMLElement).classList.add("in"); io.unobserve(e.target); }
       }),
-      { threshold: 0.08 }
+      { threshold: 0.06 }
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [result.data]);
 
-  // Hero parallax + fade on scroll
-  useEffect(() => {
-    if (!heroRef.current) return;
-    // Kick off hero reveal
-    requestAnimationFrame(() => {
-      heroRef.current?.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
-    });
-    const onScroll = () => {
-      if (!heroRef.current) return;
-      const y = window.scrollY;
-      const inner = heroRef.current.querySelector<HTMLElement>(".hero-inner");
-      if (inner) inner.style.transform = `translateY(${y * 0.22}px)`;
-      heroRef.current.style.opacity = String(Math.max(0, 1 - y / 600));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
     <>
       <Head>
-        <title>Enlyghten — Encyclopedia of Philosophical Thought</title>
+        <title>Enlyghten &mdash; The Daily Broadsheet of Ideas</title>
         <meta name="description" content="Explore the greatest philosophers in history — their lives, ideas, and lasting influence." />
       </Head>
 
-      <Navbar showSearch={isFiltered} />
+      <div className="np-shell">
+        <Navbar total={allTotal} />
 
-      {/* Hero */}
-      {!isFiltered && (
-        <div className="hero" ref={heroRef}>
-          <div className="hero-orb a" />
-          <div className="hero-orb b" />
-          <div className="hero-orb c" />
-          <div className="hero-scan" />
-          <FloatingParticles />
-
-          <div className="hero-inner">
-            <div className="hero-eyebrow reveal">
-              Encyclopedia of Philosophical Thought
-            </div>
-
-            <h1 className="reveal d1">
-              Explore the <em>Great Minds</em><br />of History
-            </h1>
-
-            <div className="hero-quote-wrap reveal d2">
-              <TypewriterText quotes={QUOTES} />
-            </div>
-
-            <div className="hero-search reveal d3">
-              <SearchBar />
-            </div>
-
-            <div className="hero-pills reveal d4">
-              {eras.slice(0, 7).map((e) => (
-                <a key={e} href={`/?era=${e}`} className="hero-pill">
-                  <span className="dot" style={{ background: eraColor(e) }} />
-                  {e}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filter banner */}
-      {isFiltered && <div style={{ height: 60 }} />}
-      {isFiltered && (
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px 28px 0" }}>
-          <div className="filter-banner">
-            {query  && <span className="filter-chip">Search: &ldquo;{query}&rdquo;</span>}
-            {era    && <span className="filter-chip">Era: {era}</span>}
-            {school && <span className="filter-chip">School: {school}</span>}
-            <span style={{ color: "var(--ink-soft)", fontSize: 12, fontFamily: "var(--mono)" }}>
+        {isFiltered && (
+          <div className="np-filter" style={{ marginTop: 24 }}>
+            {query  && <span>Search: <b>&ldquo;{query}&rdquo;</b></span>}
+            {era    && <span>Era: <b>{era}</b></span>}
+            {school && <span>School: <b>{school}</b></span>}
+            <span style={{ color: "var(--ink-soft)", fontFamily: "var(--sans)", fontSize: 11, letterSpacing: ".06em" }}>
               {result.total} result{result.total !== 1 ? "s" : ""}
             </span>
-            <a href="/" className="clear">Clear ×</a>
+            <a href="/" className="clear">Clear &times;</a>
           </div>
-        </div>
-      )}
+        )}
 
-      <main className="shell">
-        <div className="with-sidebar">
-          <FilterSidebar eras={eras} schools={schools} activeEra={era} activeSchool={school} total={allTotal} />
+        <div className="np-body">
+          <main>
+            {lead && <LeadStory p={lead} />}
 
-          <div>
-            {!isFiltered && (
-              <div className="results-head reveal in">
-                <div>
-                  <h2>All Philosophers</h2>
-                  <span className="sub">{allTotal} entries</span>
-                </div>
+            <div className="np-section-head">
+              <h3>
+                {era ? `From the ${era} Desk`
+                  : school ? school
+                  : isFiltered ? "Search Results"
+                  : "From the Newsroom"}
+              </h3>
+              <span className="rule" />
+              <span className="meta">{result.total} entries</span>
+            </div>
+
+            {grid.length === 0 && !lead ? (
+              <div className="np-empty">
+                <h3>No entries found.</h3>
+                <p>Try another section or search term, or <a href="/" style={{ color: "var(--accent)" }}>return to the front page</a>.</p>
               </div>
-            )}
-
-            {result.data.length === 0 ? (
-              <EmptyState query={query} />
             ) : (
-              <div className="grid">
-                {result.data.map((p, i) => <PhilosopherCard key={p.id} p={p} index={i} />)}
+              <div className="np-grid">
+                {grid.map((p, i) => <PhilosopherCard key={p.id} p={p} index={i} />)}
               </div>
             )}
 
             {totalPages > 1 && (
-              <div className="pager">
-                {result.page > 1 && (
-                  <button onClick={() => location.href = buildUrl(result.page - 1, query, era, school)}>← Prev</button>
-                )}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
-                  <button key={pg} className={result.page === pg ? "active" : ""}
-                    onClick={() => location.href = buildUrl(pg, query, era, school)}>{pg}</button>
-                ))}
-                {result.page < totalPages && (
-                  <button onClick={() => location.href = buildUrl(result.page + 1, query, era, school)}>Next →</button>
-                )}
+              <div className="np-pager">
+                {result.page > 1 ? (
+                  <button onClick={() => { location.href = buildUrl(result.page - 1, query, era, school); }}>
+                    &larr; Previous Page
+                  </button>
+                ) : <span />}
+                <span className="num">&mdash; {result.page} / {totalPages} &mdash;</span>
+                {result.page < totalPages ? (
+                  <button onClick={() => { location.href = buildUrl(result.page + 1, query, era, school); }}>
+                    Next Page &rarr;
+                  </button>
+                ) : <span />}
               </div>
             )}
-          </div>
-        </div>
-      </main>
+          </main>
 
-      <footer className="footer">
-        <span className="brand">Enlyghten.</span>
-        Data sourced from Wikipedia · Built with Next.js + FastAPI
-      </footer>
+          <FilterSidebar eras={eras} schools={schools} activeEra={era} activeSchool={school} total={allTotal} />
+        </div>
+
+        <footer className="footer">
+          <div className="mark">Enl<span className="y">y</span>ghten<span className="accent">.</span></div>
+          <div>All the philosophy that&rsquo;s fit to read &middot; Data sourced from Wikipedia &middot; Built with Next.js + FastAPI</div>
+        </footer>
+      </div>
     </>
   );
-}
-
-const ERA_COLORS: Record<string, string> = {
-  ancient: "#818cf8", medieval: "#c4b5fd", renaissance: "#f9a8d4",
-  enlightenment: "#7dd3fc", modern: "#93c5fd", contemporary: "#6ee7b7",
-  eastern: "#fcd34d", islamic: "#5eead4", african: "#fde047",
-};
-function eraColor(era: string) {
-  for (const [k, v] of Object.entries(ERA_COLORS)) {
-    if (era.toLowerCase().includes(k)) return v;
-  }
-  return "#94a3b8";
 }
 
 function buildUrl(page: number, q: string, era: string, school: string) {
   const p = new URLSearchParams();
   if (page > 1) p.set("page", String(page));
-  if (q) p.set("q", q);
-  if (era) p.set("era", era);
+  if (q)      p.set("q", q);
+  if (era)    p.set("era", era);
   if (school) p.set("school", school);
   const s = p.toString();
   return s ? `/?${s}` : "/";
@@ -207,8 +151,8 @@ const EMPTY_LIST: PhilosopherList = { total: 0, page: 1, limit: 21, data: [] };
 
 export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
   const page   = Number(q.page) || 1;
-  const search = (q.q as string)      || "";
-  const era    = (q.era as string)    || "";
+  const search = (q.q      as string) || "";
+  const era    = (q.era    as string) || "";
   const school = (q.school as string) || "";
   try {
     const [result, eras, schools, allData] = await Promise.all([
