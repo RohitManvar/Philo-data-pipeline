@@ -15,7 +15,7 @@ const ERA_GRADIENTS: Record<string, string> = {
 };
 
 export function eraGradient(era: string | null): string {
-  if (!era) return "linear-gradient(135deg, #4a4a4a, #888)";
+  if (!era) return "linear-gradient(135deg, #7a8a6a, #b0bea0)";
   const key = era.toLowerCase();
   for (const [k, v] of Object.entries(ERA_GRADIENTS)) {
     if (key.includes(k)) return v;

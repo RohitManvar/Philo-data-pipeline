@@ -34,8 +34,9 @@ export function cleanDate(raw: string | null | undefined): string {
 /** Return true if a school name is suitable to display as a filter option. */
 export function isCleanSchool(school: string): boolean {
   if (!school) return false;
-  if (school.length > 40) return false;       // too long = compound/messy entry
-  if (/\d/.test(school)) return false;        // contains numbers = likely raw data
-  if (school.split(",").length > 2) return false; // more than 2 parts = compound
+  if (school.length > 35) return false;
+  if (/\d/.test(school)) return false;
+  if (/century|BCE|B\.C|C\.E\b|\bAD\b|\bBC\b|Kali Yuga|millennium|venerate|denomin/i.test(school)) return false;
+  if (school.includes(",")) return false;
   return true;
 }
