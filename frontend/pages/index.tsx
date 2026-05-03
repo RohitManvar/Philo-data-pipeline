@@ -53,11 +53,11 @@ function LeadStory({ p }: { p: Philosopher }) {
 
 export default function Home({ result: initialResult, eras: initialEras, schools: initialSchools, query, era, school, allTotal: initialTotal, daily: initialDaily, allPhilosophers }: Props) {
   const router = useRouter();
-  const [result, setResult]   = useState(initialResult);
-  const [eras, setEras]       = useState(initialEras);
+  const [result, setResult] = useState(initialResult);
+  const [eras, setEras] = useState(initialEras);
   const [schools, setSchools] = useState(initialSchools);
   const [allTotal, setAllTotal] = useState(initialTotal);
-  const [daily, setDaily]     = useState(initialDaily);
+  const [daily, setDaily] = useState(initialDaily);
 
   // If SSR returned empty (Render was sleeping), retry client-side
   useEffect(() => {
@@ -70,13 +70,13 @@ export default function Home({ result: initialResult, eras: initialEras, schools
       fetchDailyPhilosopher().catch(() => null),
     ]).then(([r, e, s, all, d]) => {
       setResult(r); setEras(e); setSchools(s); setAllTotal(all.total); setDaily(d);
-    }).catch(() => {});
+    }).catch(() => { });
   }, [initialResult.total]);
 
   const totalPages = Math.ceil(result.total / result.limit);
   const isFiltered = !!(query || era || school);
-  const lead       = !isFiltered ? result.data[0] : null;
-  const grid       = !isFiltered ? result.data.slice(1) : result.data;
+  const lead = !isFiltered ? result.data[0] : null;
+  const grid = !isFiltered ? result.data.slice(1) : result.data;
   const [surprising, setSurprising] = useState(false);
 
   const handleSurprise = async () => {
@@ -89,7 +89,7 @@ export default function Home({ result: initialResult, eras: initialEras, schools
 
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>(".np-reveal:not(.in)");
-    const io  = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => {
         if (e.isIntersecting) { (e.target as HTMLElement).classList.add("in"); io.unobserve(e.target); }
       }),
@@ -111,8 +111,8 @@ export default function Home({ result: initialResult, eras: initialEras, schools
 
         {isFiltered && (
           <div className="np-filter" style={{ marginTop: 24 }}>
-            {query  && <span>Search: <b>&ldquo;{query}&rdquo;</b></span>}
-            {era    && <span>Era: <b>{era}</b></span>}
+            {query && <span>Search: <b>&ldquo;{query}&rdquo;</b></span>}
+            {era && <span>Era: <b>{era}</b></span>}
             {school && <span>School: <b>{school}</b></span>}
             <span style={{ color: "var(--ink-soft)", fontFamily: "var(--sans)", fontSize: 11, letterSpacing: ".06em" }}>
               {result.total} result{result.total !== 1 ? "s" : ""}
@@ -147,8 +147,8 @@ export default function Home({ result: initialResult, eras: initialEras, schools
               <h3>
                 {era ? `From the ${era} Desk`
                   : school ? school
-                  : isFiltered ? "Search Results"
-                  : "From the Newsroom"}
+                    : isFiltered ? "Search Results"
+                      : "From the Newsroom"}
               </h3>
               <span className="rule" />
               <span className="meta">{result.total} entries</span>
@@ -199,8 +199,8 @@ export default function Home({ result: initialResult, eras: initialEras, schools
 function buildUrl(page: number, q: string, era: string, school: string) {
   const p = new URLSearchParams();
   if (page > 1) p.set("page", String(page));
-  if (q)      p.set("q", q);
-  if (era)    p.set("era", era);
+  if (q) p.set("q", q);
+  if (era) p.set("era", era);
   if (school) p.set("school", school);
   const s = p.toString();
   return s ? `/?${s}` : "/";
@@ -209,15 +209,15 @@ function buildUrl(page: number, q: string, era: string, school: string) {
 const EMPTY_LIST: PhilosopherList = { total: 0, page: 1, limit: 21, data: [] };
 
 export const getServerSideProps: GetServerSideProps = async ({ query: q }) => {
-  const page   = Number(q.page) || 1;
-  const search = (q.q      as string) || "";
-  const era    = (q.era    as string) || "";
+  const page = Number(q.page) || 1;
+  const search = (q.q as string) || "";
+  const era = (q.era as string) || "";
   const school = (q.school as string) || "";
   try {
     const [result, eras, schools, allData, daily] = await Promise.all([
       search ? searchPhilosophers(search, page)
-             : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
-             : fetchPhilosophers(page),
+        : era || school ? filterPhilosophers(era || undefined, school || undefined, page)
+          : fetchPhilosophers(page),
       fetchEras(), fetchSchools(), fetchPhilosophers(1, 1),
       fetchDailyPhilosopher().catch(() => null),
     ]);

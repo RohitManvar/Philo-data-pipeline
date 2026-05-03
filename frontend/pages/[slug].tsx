@@ -13,9 +13,9 @@ import { isSaved } from "../lib/readingList";
 export default function PhilosopherPage({ p }: { p: Philosopher }) {
   const ref = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [copied, setCopied]     = useState(false);
+  const [copied, setCopied] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
-  const [imgOpen, setImgOpen]   = useState(false);
+  const [imgOpen, setImgOpen] = useState(false);
 
   // Reading progress bar
   useEffect(() => {
@@ -117,11 +117,11 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
     }).finally(() => { setNoteSaving(false); setNoteEdit(false); });
   };
 
-  const inits     = useMemo(() => initials(p.philosopher_name), [p.philosopher_name]);
+  const inits = useMemo(() => initials(p.philosopher_name), [p.philosopher_name]);
   const firstName = useMemo(() => p.philosopher_name.split(" ")[0], [p.philosopher_name]);
-  const ideas       = useMemo(() => p.main_ideas    ? p.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean).slice(0, 6) : [], [p.main_ideas]);
+  const ideas = useMemo(() => p.main_ideas ? p.main_ideas.split(/[,·;]/).map(s => s.trim()).filter(Boolean).slice(0, 6) : [], [p.main_ideas]);
   const influencedBy = useMemo(() => p.influenced_by ? p.influenced_by.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [], [p.influenced_by]);
-  const influenced   = useMemo(() => p.influenced   ? p.influenced.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [], [p.influenced]);
+  const influenced = useMemo(() => p.influenced ? p.influenced.split(/[,·;]/).map(s => s.trim()).filter(Boolean) : [], [p.influenced]);
 
   return (
     <>
@@ -183,7 +183,7 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
             <div className="meta">
               {p.birth && <span>Born <b>{cleanDate(p.birth)}</b></span>}
               {p.death && <span>Died <b>{cleanDate(p.death)}</b></span>}
-              {p.era   && <span>Era <b>{p.era}</b></span>}
+              {p.era && <span>Era <b>{p.era}</b></span>}
               <span>By <b>The Editors</b></span>
             </div>
           </div>
@@ -260,9 +260,9 @@ export default function PhilosopherPage({ p }: { p: Philosopher }) {
                 <div className="np-sidecard np-reveal">
                   <div className="h">At a Glance</div>
                   <dl>
-                    {p.birth  && <><dt>Born</dt><dd>{cleanDate(p.birth)}</dd></>}
-                    {p.death  && <><dt>Died</dt><dd>{cleanDate(p.death)}</dd></>}
-                    {p.era    && <><dt>Era</dt><dd>{p.era}</dd></>}
+                    {p.birth && <><dt>Born</dt><dd>{cleanDate(p.birth)}</dd></>}
+                    {p.death && <><dt>Died</dt><dd>{cleanDate(p.death)}</dd></>}
+                    {p.era && <><dt>Era</dt><dd>{p.era}</dd></>}
                     {p.school && <><dt>School</dt><dd>{p.school}</dd></>}
                   </dl>
                 </div>

@@ -15,13 +15,13 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
-  const user    = session?.user;
+  const user = session?.user;
   const loading = status === "loading";
-  const router  = useRouter();
+  const router = useRouter();
 
-  const [saved, setSaved]         = useState<SavedPhilosopher[]>([]);
-  const [suggest, setSuggest]     = useState<Philosopher | null>(null);
-  const [theme, setTheme]         = useState<"light"|"dark">("light");
+  const [saved, setSaved] = useState<SavedPhilosopher[]>([]);
+  const [suggest, setSuggest] = useState<Philosopher | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   useEffect(() => { setTheme(getTheme()); }, []);
 
   useEffect(() => {
@@ -46,14 +46,14 @@ export default function ProfilePage() {
             const unsaved = res.data?.filter((p: Philosopher) => !savedSlugs.has(p.slug)) || [];
             if (unsaved.length > 0) setSuggest(unsaved[Math.floor(Math.random() * unsaved.length)]);
           })
-          .catch(() => {});
+          .catch(() => { });
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [session]);
 
   if (loading || !user) return null;
 
-  const name  = user.name  || user.email || "Reader";
+  const name = user.name || user.email || "Reader";
   const email = user.email || "";
 
   const eraCounts: Record<string, number> = {};
