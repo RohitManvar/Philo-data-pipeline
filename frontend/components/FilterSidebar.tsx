@@ -19,9 +19,12 @@ const QUOTES = [
   { text: "I think, therefore I am.", who: "Descartes" },
 ];
 
+const KNOWN_ERAS = ["Ancient", "Medieval", "Renaissance", "Enlightenment", "Modern", "Contemporary", "Eastern"];
+
 type Panel = "thinkers" | "eras" | "schools" | null;
 
 export default function FilterSidebar({ eras, schools, activeEra, activeSchool, total }: Props) {
+  const cleanEras = KNOWN_ERAS.filter(e => eras.includes(e));
   const router  = useRouter();
   const isAll   = !activeEra && !activeSchool;
   const quote   = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length];
@@ -58,7 +61,7 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
             <div className="l">Thinkers</div>
           </button>
           <button className={"np-stat-btn" + (open === "eras" ? " active" : "")} onClick={() => toggle("eras")}>
-            <div className="n">{eras.length}</div>
+            <div className="n">{cleanEras.length}</div>
             <div className="l">Eras</div>
           </button>
           <button className={"np-stat-btn" + (open === "schools" ? " active" : "")} onClick={() => toggle("schools")}>
@@ -95,7 +98,7 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
           <div className="np-stat-panel">
             <div className="np-stat-panel-head">All Eras</div>
             <ul className="np-stat-list">
-              {eras.map(era => (
+              {cleanEras.map(era => (
                 <li key={era}>
                   <button className="np-stat-list-link" onClick={() => { apply(era); setOpen(null); }}>
                     <span>{era}</span>
@@ -129,7 +132,7 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
             <span>All Departments</span>
             <span className="num">{total}</span>
           </li>
-          {eras.map((era) => (
+          {cleanEras.map((era) => (
             <li key={era} className={activeEra === era ? "active" : ""} onClick={() => apply(era)}>
               <span>{era}</span>
             </li>
@@ -141,7 +144,7 @@ export default function FilterSidebar({ eras, schools, activeEra, activeSchool, 
         <div className="np-aside-block">
           <div className="head">Schools of Thought</div>
           <ul className="np-era-list">
-            {schools.filter(isCleanSchool).slice(0, 12).map((school) => (
+            {schools.filter(isCleanSchool).slice(0, 10).map((school) => (
               <li
                 key={school}
                 className={activeSchool === school ? "active" : ""}
