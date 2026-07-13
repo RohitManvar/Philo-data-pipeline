@@ -5,23 +5,38 @@ import os
 
 def get_connection():
     host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", 5434)
+    port = int(os.getenv("DB_PORT", 5434))
     dbname = os.getenv("DB_NAME", "philo_db")
     user = os.getenv("DB_USER", "postgres")
     password = os.getenv("DB_PASSWORD", "password")
     
-    # If not on localhost, enforce SSL and disable GSSAPI to prevent some load balancers 
-    # (like PgBouncer or Cloud SQL Proxy) from abruptly dropping the connection
+    if host not in ["localhost", "127.0.0.1"]:
+        print(f"[DEBUG] Running pure-Python SSL diagnostic to {host}:{port}...")
+        try:
+            import socket, ssl, struct
+            sock = socket.create_connection((host, port), timeout=5)
+            sock.sendall(struct.pack("!II", 8, 80877103))
+            resp = sock.recv(1)
+            if resp == b'S':
+                print("[DEBUG] Server said 'S' (SSL supported). Handshaking...")
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                ssock = ctx.wrap_socket(sock, server_hostname=host)
+                print(f"[DEBUG] Handshake SUCCESS! Cipher: {ssock.cipher()}")
+                ssock.close()
+            else:
+                print(f"[DEBUG] Server refused SSL request: {resp}")
+                sock.close()
+        except Exception as e:
+            print(f"[DEBUG] SSL diagnostic failed: {type(e).__name__}: {e}")
+            
     sslmode = "require" if host not in ["localhost", "127.0.0.1"] else "prefer"
     
+    print(f"[LOAD] psycopg2 connecting with sslmode={sslmode} and gssencmode=disable")
     return psycopg2.connect(
-        host=host, 
-        port=port, 
-        dbname=dbname, 
-        user=user, 
-        password=password, 
-        sslmode=sslmode,
-        gssencmode="disable"
+        host=host, port=port, dbname=dbname, user=user, password=password, 
+        sslmode=sslmode, gssencmode="disable"
     )
 
 
