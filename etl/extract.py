@@ -102,7 +102,15 @@ def get_philosopher_links(limit: int = 100) -> list[str]:
         try:
             resp = requests.get(WIKI_API, params=params, headers=HEADERS, timeout=10)
             resp.raise_for_status()
-            members = resp.json().get("query", {}).get("categorymembers", [])
+            if not resp.text.strip():
+                print(f"  Empty response for category {category}")
+                continue
+            try:
+                data = resp.json()
+            except ValueError as e:
+                print(f"  JSON decode error for {category}: {e}. Response: {resp.text[:200]}")
+                continue
+            members = data.get("query", {}).get("categorymembers", [])
             for m in members:
                 title = m["title"]
                 if title.startswith(("List ", "Index ", "Outline ", "Category:", "Template:")):

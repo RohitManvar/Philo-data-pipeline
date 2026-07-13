@@ -4,17 +4,28 @@ import os
 
 
 def get_connection():
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", 5434)
+    dbname = os.getenv("DB_NAME", "philo_db")
+    user = os.getenv("DB_USER", "postgres")
+    password = os.getenv("DB_PASSWORD", "password")
     sslmode = os.getenv("DB_SSLMODE")
+    
     if not sslmode:
-        sslmode = "require" if os.getenv("DB_HOST", "localhost") not in ["localhost", "127.0.0.1"] else "prefer"
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=os.getenv("DB_PORT", 5434),
-        dbname=os.getenv("DB_NAME", "philo_db"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "password"),
-        sslmode=sslmode,
-    )
+        sslmode = "require" if host not in ["localhost", "127.0.0.1"] else "prefer"
+    
+    try:
+        return psycopg2.connect(
+            host=host, port=port, dbname=dbname, user=user, password=password, sslmode=sslmode
+        )
+    except psycopg2.OperationalError as e:
+        print(f"[WARN] Connection with sslmode={sslmode} failed: {e}")
+        if sslmode == "require":
+            print("[WARN] Retrying connection with sslmode='disable'...")
+            return psycopg2.connect(
+                host=host, port=port, dbname=dbname, user=user, password=password, sslmode="disable"
+            )
+        raise
 
 
 UPSERT_SQL = """
