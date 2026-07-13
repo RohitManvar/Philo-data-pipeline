@@ -4,12 +4,16 @@ import os
 
 
 def get_connection():
+    sslmode = os.getenv("DB_SSLMODE")
+    if not sslmode:
+        sslmode = "require" if os.getenv("DB_HOST", "localhost") not in ["localhost", "127.0.0.1"] else "prefer"
     return psycopg2.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=os.getenv("DB_PORT", 5434),
         dbname=os.getenv("DB_NAME", "philo_db"),
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD", "password"),
+        sslmode=sslmode,
     )
 
 

@@ -7,7 +7,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 BASE_URL = "https://en.wikipedia.org"
-HEADERS = {"User-Agent": "Mozilla/5.0 (PhiloDataBot/1.0)"}
+HEADERS = {"User-Agent": "PhiloDataBot/1.0 (https://github.com/RohitManvar/Philo-data-pipeline; bot@example.com)"}
 
 
 def create_slug(name: str) -> str:
@@ -101,6 +101,7 @@ def get_philosopher_links(limit: int = 100) -> list[str]:
         }
         try:
             resp = requests.get(WIKI_API, params=params, headers=HEADERS, timeout=10)
+            resp.raise_for_status()
             members = resp.json().get("query", {}).get("categorymembers", [])
             for m in members:
                 title = m["title"]
@@ -120,6 +121,7 @@ def get_philosopher_links(limit: int = 100) -> list[str]:
 
 def scrape_philosopher(url: str) -> dict:
     response = requests.get(url, headers=HEADERS, timeout=10)
+    response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
     name = soup.find("h1").get_text(strip=True)
