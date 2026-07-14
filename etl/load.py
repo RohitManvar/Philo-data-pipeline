@@ -1,43 +1,42 @@
 import psycopg2
 import psycopg2.extras
 import os
+import time
 
 
 def get_connection():
-    host = os.getenv("DB_HOST", "localhost")
-    port = int(os.getenv("DB_PORT", 5434))
-    dbname = os.getenv("DB_NAME", "philo_db")
-    user = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD", "password")
-    
-    if host not in ["localhost", "127.0.0.1"]:
-        print(f"[DEBUG] Running pure-Python SSL diagnostic to {host}:{port}...")
-        try:
-            import socket, ssl, struct
-            sock = socket.create_connection((host, port), timeout=5)
-            sock.sendall(struct.pack("!II", 8, 80877103))
-            resp = sock.recv(1)
-            if resp == b'S':
-                print("[DEBUG] Server said 'S' (SSL supported). Handshaking...")
-                ctx = ssl.create_default_context()
-                ctx.check_hostname = False
-                ctx.verify_mode = ssl.CERT_NONE
-                ssock = ctx.wrap_socket(sock, server_hostname=host)
-                print(f"[DEBUG] Handshake SUCCESS! Cipher: {ssock.cipher()}")
-                ssock.close()
-            else:
-                print(f"[DEBUG] Server refused SSL request: {resp}")
-                sock.close()
-        except Exception as e:
-            print(f"[DEBUG] SSL diagnostic failed: {type(e).__name__}: {e}")
-            
-    sslmode = "require" if host not in ["localhost", "127.0.0.1"] else "prefer"
-    
-    print(f"[LOAD] psycopg2 connecting with sslmode={sslmode} and gssencmode=disable")
-    return psycopg2.connect(
-        host=host, port=port, dbname=dbname, user=user, password=password, 
-        sslmode=sslmode, gssencmode="disable"
+    base = dict(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", 5434)),
+        dbname=os.getenv("DB_NAME", "philo_db"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "password"),
+        connect_timeout=15,
     )
+
+    if base["host"] in ("localhost", "127.0.0.1"):
+        return psycopg2.connect(sslmode="prefer", **base)
+
+    # Render's SNI proxy drops TLS 1.3 ClientHellos that exceed one TCP
+    # segment (OpenSSL 3.5+ post-quantum key exchange), so fall back to
+    # TLS 1.2, whose ClientHello is always small.
+    strategies = [
+        {"sslmode": "require", "gssencmode": "disable"},
+        {"sslmode": "require", "gssencmode": "disable",
+         "ssl_max_protocol_version": "TLSv1.2"},
+    ]
+    last_err = None
+    for attempt in range(1, 4):
+        for params in strategies:
+            desc = ", ".join(f"{k}={v}" for k, v in params.items())
+            print(f"[LOAD] Connecting (attempt {attempt}: {desc})")
+            try:
+                return psycopg2.connect(**base, **params)
+            except psycopg2.OperationalError as e:
+                last_err = e
+                print(f"[LOAD] Connection failed: {e}")
+        time.sleep(5 * attempt)
+    raise last_err
 
 
 UPSERT_SQL = """

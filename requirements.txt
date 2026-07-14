@@ -3,6 +3,8 @@ beautifulsoup4>=4.12.0
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 sqlalchemy>=2.0.30
-psycopg2-binary>=2.9.9
+# Pinned: 2.9.10+ wheels bundle libpq 17 / OpenSSL 3.5, whose large TLS 1.3
+# ClientHello (post-quantum key exchange) is dropped by Render's SNI proxy.
+psycopg2-binary==2.9.9
 pydantic>=2.7.0
 python-dotenv>=1.0.0
