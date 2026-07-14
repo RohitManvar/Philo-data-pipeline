@@ -4,18 +4,40 @@ import os
 import time
 
 
+def _check_host(host: str) -> None:
+    """Sanity-check DB_HOST without echoing the secret itself."""
+    if "://" in host:
+        print("[LOAD] WARNING: DB_HOST looks like a full URL. It must be "
+              "only the hostname (no postgres://, user, or port).")
+    elif "." not in host:
+        print("[LOAD] WARNING: DB_HOST has no domain part, so it looks like "
+              "a Render INTERNAL hostname (dpg-xxx-a). GitHub Actions needs "
+              "the EXTERNAL hostname: dpg-xxx-a.<region>-postgres.render.com")
+    elif not host.endswith(".render.com"):
+        print("[LOAD] NOTE: DB_HOST does not end with .render.com")
+    import socket
+    try:
+        addr = socket.getaddrinfo(host, None)[0][4][0]
+        print(f"[LOAD] DB_HOST resolves to {addr}")
+    except OSError as e:
+        print(f"[LOAD] DB_HOST does not resolve ({e}). Check the hostname in "
+              f"the GitHub secret (length={len(host)}, dots={host.count('.')}).")
+
+
 def get_connection():
     base = dict(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=int(os.getenv("DB_PORT", 5434)),
-        dbname=os.getenv("DB_NAME", "philo_db"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "password"),
+        host=os.getenv("DB_HOST", "localhost").strip(),
+        port=int(os.getenv("DB_PORT", "5434").strip()),
+        dbname=os.getenv("DB_NAME", "philo_db").strip(),
+        user=os.getenv("DB_USER", "postgres").strip(),
+        password=os.getenv("DB_PASSWORD", "password").strip(),
         connect_timeout=15,
     )
 
     if base["host"] in ("localhost", "127.0.0.1"):
         return psycopg2.connect(sslmode="prefer", **base)
+
+    _check_host(base["host"])
 
     # Render's SNI proxy drops TLS 1.3 ClientHellos that exceed one TCP
     # segment (OpenSSL 3.5+ post-quantum key exchange), so fall back to

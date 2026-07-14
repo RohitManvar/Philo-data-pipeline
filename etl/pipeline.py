@@ -1,12 +1,17 @@
 from extract import run_extract
 from transform import run_transform
-from load import run_load
+from load import run_load, get_connection
 
 
 def run_pipeline(limit: int = 100):
     print("=" * 40)
     print("PHILO ETL PIPELINE STARTED")
     print("=" * 40)
+
+    # Fail fast on DB config problems before spending minutes scraping.
+    print("[PREFLIGHT] Verifying database connectivity...")
+    get_connection().close()
+    print("[PREFLIGHT] Database reachable.")
 
     raw = run_extract(limit=limit)
     clean = run_transform(raw)
